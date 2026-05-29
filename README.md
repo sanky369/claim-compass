@@ -1,36 +1,200 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClaimCompass
 
-## Getting Started
+ClaimCompass is a Google Cloud Rapid Agent Hackathon project for the MongoDB
+track. It is a denial-resolution copilot for independent healthcare providers:
+upload a denied claim, let the agent read it, retrieve payer-specific rules,
+choose the next-best action, draft the fix, and write the result back to
+MongoDB.
 
-First, run the development server:
+The hackathon demo focuses on one synthetic golden path: CPT `90837`, missing
+telehealth modifier `95`, denial codes `CO-45` and `N179`, classified as a
+`corrected_claim`.
+
+> Demo data only. This project must not be used with real PHI, payer portal
+> screenshots, real EOBs, subscriber IDs, or patient documents.
+
+## What It Builds
+
+ClaimCompass is not just a denial explainer. The v1 demo proves a complete
+agent loop:
+
+1. Read a synthetic EOB PDF with Google Document AI.
+2. Store and update the denial record in MongoDB Atlas.
+3. Retrieve payer playbook guidance from MongoDB Atlas Vector Search through
+   the official MongoDB MCP Server.
+4. Use Gemini and ADK agents to classify the denial into a resolution bucket.
+5. Generate corrected-claim guidance with citations.
+6. Persist the generated artifact and trace events back to MongoDB.
+7. Show the run in a Next.js demo UI with trace, citations, and before/after
+   document state.
+
+## Hackathon Stack
+
+| Layer | Choice |
+|---|---|
+| Frontend | Next.js App Router |
+| Agent framework | Google ADK / Agents CLI |
+| Agent runtime | Google Cloud Agent Runtime / Vertex AI Agent Engine |
+| Models | Gemini generation and `gemini-embedding-001` embeddings |
+| OCR | Google Document AI Form Parser |
+| Database | MongoDB Atlas |
+| Retrieval | MongoDB Atlas Vector Search |
+| Agent database access | Official MongoDB MCP Server |
+| Secrets | Google Secret Manager for deployed config, ignored `.env.local` locally |
+| Hosting target | Cloud Run for the demo app |
+
+The submission wording is:
+
+> Built with Gemini and Google Cloud Agent Builder using ADK, deployed on Agent
+> Runtime / Vertex AI Agent Engine, and integrated with MongoDB Atlas through
+> the official MongoDB MCP Server.
+
+## Repository Map
+
+```text
+.
+├── app/                         # Next.js app shell
+├── components/                  # Landing/demo UI components
+├── claimcompass-agent/          # ADK / Agents CLI backend scaffold
+├── docs/
+│   ├── HACKATHON_BLUEPRINT.md   # Product, architecture, and judging strategy
+│   ├── HACKATHON_BP_IMPLEMENTATION.md
+│   └── test-documents/          # Synthetic EOB fixtures and rendered previews
+├── scripts/
+│   ├── document-ai/             # Golden Document AI smoke path
+│   └── mongodb/                 # Atlas bootstrap and MCP smoke tests
+├── .agents-cli-spec.md          # Agent behavior, tools, data model, demo contract
+└── AGENTS.md                    # Repo-wide agent, security, and cost guardrails
+```
+
+## Current Build Status
+
+Completed systems are tracked in
+[`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
+As of the current baseline commit, Systems 0-7 are complete:
+
+- Project guardrails and docs
+- Google Cloud project and cost controls
+- Agent implementation spec
+- ADK scaffold and hello Agent Runtime proof
+- MongoDB Atlas foundation
+- MongoDB MCP smoke path
+- Synthetic demo data
+- Document AI extraction with MongoDB MCP write-back
+
+Next systems:
+
+- System 8: playbook chunks and Gemini embeddings
+- System 9: Atlas Vector Search index and query path
+- System 10: PolicyAgent retrieval through MCP
+
+## Local Setup
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create local environment config:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill `.env.local` with a least-privilege Atlas URI for the `claimcompass`
+database. Do not commit `.env.local`.
+
+Run the web app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run lint:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## MongoDB Setup and Smoke Tests
 
-## Learn More
+Bootstrap the local Atlas collections and synthetic seed data:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run mongodb:bootstrap
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Inspect local MongoDB MCP tools:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run mongodb:mcp-tools
+```
 
-## Deploy on Vercel
+Run the MCP smoke test:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run mongodb:mcp-smoke
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The smoke path verifies `find`, `aggregate`, `insert-many`, `update-many`, and
+`count` through the official MongoDB MCP Server. For this repo,
+`mongodb-mcp-server@1.11.0` exposes `update-many`, so v1 write-back uses a
+unique `denial_id` filter instead of an unavailable `update-one`.
+
+## Document AI Smoke Test
+
+The golden EOB smoke path uploads the synthetic PDF to the configured demo GCS
+bucket, processes it with Document AI Form Parser, extracts denial fields, and
+writes the result back to MongoDB through MCP:
+
+```bash
+npm run docai:golden-smoke
+```
+
+Required Google Cloud config is stored in Secret Manager for deployed use:
+
+- `documentai-processor-id`
+- `documentai-location`
+- `gcp-project-id`
+- `gcs-upload-bucket`
+- `mongodb-uri`
+
+## Security and Cost Guardrails
+
+- Use only synthetic data marked `DEMO DATA - NOT REAL PHI`.
+- Never commit PHI, real EOBs, payer portal screenshots, secrets, tokens, or
+  Atlas connection strings.
+- Use Google Secret Manager for deployed secrets and ignored `.env.local` for
+  local development.
+- Keep Atlas on `M0` unless a paid tier is explicitly approved.
+- Keep Cloud Run min instances at `0` except during recording or rehearsal.
+- Do not run paid deploys or enable broad cloud services without an explicit
+  reason and cost check.
+- Generated guidance is decision support only and requires human review.
+
+See [`AGENTS.md`](AGENTS.md) for the complete repository operating rules.
+
+## Development Workflow
+
+This project is being built system by system for the hackathon. After each
+completed system:
+
+1. Run the relevant acceptance checks from the tracker.
+2. Update `docs/HACKATHON_BP_IMPLEMENTATION.md`.
+3. Commit with a message that names the completed system.
+4. Push to GitHub.
+
+Useful references:
+
+- Hackathon blueprint:
+  [`docs/HACKATHON_BLUEPRINT.md`](docs/HACKATHON_BLUEPRINT.md)
+- Implementation tracker:
+  [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md)
+- Agent spec:
+  [`.agents-cli-spec.md`](.agents-cli-spec.md)
+
+## License
+
+License is not finalized yet. Add a root `LICENSE` before the final Devpost
+submission.
