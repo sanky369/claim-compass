@@ -1,0 +1,28 @@
+DEMO DATA - NOT REAL PHI
+
+Paste fallback case for ClaimCompass golden demo.
+
+Payer: Blue Cross Blue Shield of Texas Demo Plan
+Payer ID: bcbs_tx
+Claim ID: DEMO-DENIAL-001
+Patient: Jordan Sample
+Provider: Clear Path Therapy PLLC / Dr. Maya Iyer, LPC
+Date of service: 2026-05-12
+Claim status: denied
+
+Service line:
+- CPT 90837
+- Psychotherapy, 60 minutes
+- Diagnosis F41.1
+- Place of service 10
+- Submitted modifiers: none
+- Billed 184.00
+- Allowed 0.00
+- Paid 0.00
+
+Denial codes:
+- CARC CO-45
+- RARC N179
+
+Payer message:
+The service line appears to be telehealth based on POS 10, but the claim did not include the required telehealth modifier. Review and submit a corrected claim if the service was delivered by synchronous audio-video telehealth.

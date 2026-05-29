@@ -1,0 +1,54 @@
+DEMO DATA - NOT REAL PHI
+SYNTHETIC CLAIM DENIAL NOTICE
+
+Document purpose: ClaimCompass eval edge case
+This is a synthetic document. It is not a real payer form, not a real EOB, and not a real patient record.
+
+PAYER
+Payer display name: Aetna Demo Behavioral Health
+Payer ID: aetna
+Payer claim reference: DEMO-AETNA-2026-000091
+
+PROVIDER
+Billing provider: Northstar Counseling Group
+Rendering provider: Alex Romero, LCSW
+Billing NPI: 1888888881
+Rendering NPI: 1888888882
+
+MEMBER
+Patient name: Casey Example
+Member ID: DEMO-MEMBER-5529
+
+CLAIM SUMMARY
+Claim ID: DEMO-DENIAL-002
+Date of service: 2026-05-08
+Claim status: DENIED
+
+SERVICE LINE
+Procedure code: 90791
+Description: Psychiatric diagnostic evaluation
+Diagnosis: F33.1
+Place of service: 02
+Submitted modifiers: 95
+Units: 1
+Billed amount: 210.00
+Allowed amount: 0.00
+Paid amount: 0.00
+
+ADJUSTMENT DETAILS
+Group code: CO
+CARC: CO-197
+CARC text: Precertification/authorization/notification absent.
+RARC: N130
+RARC text: Consult plan benefit documents/guidelines for information about restrictions for this service.
+
+PAYER MESSAGE
+Our records do not show an authorization for this evaluation before the date of service. If authorization was obtained, submit the authorization reference and supporting documentation. If authorization was not required under the plan, submit documentation supporting the exception.
+
+CLAIMCOMPASS EXPECTED INTERPRETATION
+This is not a simple corrected-claim issue.
+Expected bucket: true_appeal
+Expected action: gather authorization evidence or plan exception documentation before appeal/follow-up.
+
+DEMO WATERMARK
+DEMO DATA - NOT REAL PHI

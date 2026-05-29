@@ -1,0 +1,53 @@
+DEMO DATA - NOT REAL PHI
+SYNTHETIC CLAIM DENIAL NOTICE
+
+Document purpose: ClaimCompass eval edge case
+This is a synthetic document. It is not a real payer form, not a real EOB, and not a real patient record.
+
+PAYER
+Payer display name: Blue Cross Blue Shield of Texas Demo Plan
+Payer ID: bcbs_tx
+Payer claim reference: DEMO-BCBSTX-2026-000232
+
+PROVIDER
+Billing provider: Clear Path Therapy PLLC
+Rendering provider: Dr. Maya Iyer, LPC
+Billing NPI: 1999999991
+Rendering NPI: 1999999992
+
+MEMBER
+Patient name: Morgan Demo
+Member ID: DEMO-MEMBER-3490
+
+CLAIM SUMMARY
+Claim ID: DEMO-DENIAL-003
+Date of service: 2026-05-15
+Claim status: REJECTED
+
+SERVICE LINE
+Procedure code: 90834
+Description: Psychotherapy, 45 minutes
+Diagnosis: F43.22
+Place of service: 11
+Submitted modifiers: 95
+Units: 1
+Billed amount: 142.00
+Allowed amount: 0.00
+Paid amount: 0.00
+
+ADJUSTMENT DETAILS
+Group code: CO
+CARC: CO-16
+CARC text: Claim/service lacks information or has submission/billing error(s).
+RARC: M51
+RARC text: Missing/incomplete/invalid procedure code(s) and/or modifier(s).
+
+PAYER MESSAGE
+The service line contains inconsistent location and modifier information. The claim was submitted with an in-office place of service and a telehealth modifier. Review the service location and resubmit corrected claim data.
+
+CLAIMCOMPASS EXPECTED INTERPRETATION
+Expected bucket: corrected_claim
+Expected action: correct place-of-service/modifier mismatch and resubmit.
+
+DEMO WATERMARK
+DEMO DATA - NOT REAL PHI

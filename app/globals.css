@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #fafaf9;
+  --color-foreground: #1c1917;
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --color-brand-50: #f0f7ff;
+  --color-brand-100: #e0eefe;
+  --color-brand-200: #bbdcfe;
+  --color-brand-300: #7ec0fd;
+  --color-brand-400: #38a0fa;
+  --color-brand-500: #0f84eb;
+  --color-brand-600: #0367c9;
+  --color-brand-700: #0354a3;
+  --color-brand-800: #074886;
+  --color-brand-900: #0c3d6f;
+  --color-accent-500: #f59e0b;
+  --color-ink: #0c1018;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+/* Subtle paper grain for hero */
+.grain {
+  background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(12, 16, 24, 0.06) 1px,
+      transparent 0
+    );
+  background-size: 22px 22px;
+}
+
+.gradient-radial {
+  background: radial-gradient(
+    1200px 600px at 50% -10%,
+    rgba(56, 160, 250, 0.18),
+    transparent 60%
+  );
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
 }

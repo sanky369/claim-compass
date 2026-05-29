@@ -1,0 +1,71 @@
+{
+  "corpus": "claimcompass-hackathon-synthetic-test-documents",
+  "created_for": "Google Cloud Rapid Agent Hackathon demo and evals",
+  "phi_status": "synthetic-no-phi",
+  "ip_status": "not-real-payer-templates",
+  "documents": [
+    {
+      "file": "golden-bcbs-tx-90837-missing-modifier-eob.txt",
+      "pdf_file": "pdf/golden-bcbs-tx-90837-missing-modifier-eob.pdf",
+      "rendered_preview": "rendered/golden-bcbs-tx-90837-missing-modifier-eob-1.png",
+      "role": "primary_demo",
+      "input_type": "pdf_ocr_primary",
+      "payer_id": "bcbs_tx",
+      "cpt": "90837",
+      "carc": ["CO-45"],
+      "rarc": ["N179"],
+      "expected_bucket": "corrected_claim",
+      "expected_action": "Submit corrected claim with telehealth modifier 95."
+    },
+    {
+      "file": "golden-bcbs-tx-90837-missing-modifier-paste-fallback.txt",
+      "role": "ocr_fallback",
+      "input_type": "plain_text_fallback",
+      "payer_id": "bcbs_tx",
+      "cpt": "90837",
+      "carc": ["CO-45"],
+      "rarc": ["N179"],
+      "expected_bucket": "corrected_claim",
+      "expected_action": "Submit corrected claim with telehealth modifier 95."
+    },
+    {
+      "file": "edge-aetna-90791-prior-auth-denial.txt",
+      "pdf_file": "pdf/edge-aetna-90791-prior-auth-denial.pdf",
+      "rendered_preview": "rendered/edge-aetna-90791-prior-auth-denial-1.png",
+      "role": "eval_edge_case",
+      "input_type": "pdf_ocr_eval",
+      "payer_id": "aetna",
+      "cpt": "90791",
+      "carc": ["CO-197"],
+      "rarc": ["N130"],
+      "expected_bucket": "true_appeal",
+      "expected_action": "Draft appeal or payer follow-up based on prior authorization evidence."
+    },
+    {
+      "file": "edge-bcbs-tx-90834-pos-mismatch-denial.txt",
+      "pdf_file": "pdf/edge-bcbs-tx-90834-pos-mismatch-denial.pdf",
+      "rendered_preview": "rendered/edge-bcbs-tx-90834-pos-mismatch-denial-1.png",
+      "role": "eval_edge_case",
+      "input_type": "pdf_ocr_eval",
+      "payer_id": "bcbs_tx",
+      "cpt": "90834",
+      "carc": ["CO-16"],
+      "rarc": ["M51"],
+      "expected_bucket": "corrected_claim",
+      "expected_action": "Correct place-of-service/session metadata and resubmit."
+    },
+    {
+      "file": "edge-uhc-90837-credentialing-denial.txt",
+      "pdf_file": "pdf/edge-uhc-90837-credentialing-denial.pdf",
+      "rendered_preview": "rendered/edge-uhc-90837-credentialing-denial-1.png",
+      "role": "eval_edge_case",
+      "input_type": "pdf_ocr_eval",
+      "payer_id": "uhc",
+      "cpt": "90837",
+      "carc": ["CO-185"],
+      "rarc": ["N290"],
+      "expected_bucket": "credentialing",
+      "expected_action": "Investigate provider enrollment, NPI, taxonomy, or panel effective date before appeal."
+    }
+  ]
+}

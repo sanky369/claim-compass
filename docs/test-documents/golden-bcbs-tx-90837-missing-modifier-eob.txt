@@ -1,0 +1,56 @@
+DEMO DATA - NOT REAL PHI
+SYNTHETIC EXPLANATION OF BENEFITS / CLAIM DENIAL NOTICE
+
+Document purpose: ClaimCompass golden-path hackathon demo
+This is a synthetic document. It is not a real payer form, not a real EOB, and not a real patient record.
+
+PAYER
+Payer display name: Blue Cross Blue Shield of Texas Demo Plan
+Payer ID: bcbs_tx
+Payer claim reference: DEMO-BCBSTX-2026-000184
+
+PROVIDER
+Billing provider: Clear Path Therapy PLLC
+Rendering provider: Dr. Maya Iyer, LPC
+Billing NPI: 1999999991
+Rendering NPI: 1999999992
+Tax ID: 12-3456789
+Service location: Telehealth
+
+MEMBER
+Patient name: Jordan Sample
+Member ID: DEMO-MEMBER-8842
+Date of birth: 1990-01-01
+
+CLAIM SUMMARY
+Claim ID: DEMO-DENIAL-001
+Date of service: 2026-05-12
+Received date: 2026-05-13
+Processed date: 2026-05-16
+Claim status: DENIED
+
+SERVICE LINE
+Line: 1
+Procedure code: 90837
+Description: Psychotherapy, 60 minutes
+Diagnosis: F41.1
+Place of service: 10
+Submitted modifiers: none
+Units: 1
+Billed amount: 184.00
+Allowed amount: 0.00
+Paid amount: 0.00
+Patient responsibility: 0.00
+
+ADJUSTMENT DETAILS
+Group code: CO
+CARC: CO-45
+CARC text: Charge exceeds fee schedule/maximum allowable or contracted/legislated fee arrangement.
+RARC: N179
+RARC text: Additional information has been requested or required to process this claim.
+
+PAYER MESSAGE
+The submitted professional service line could not be processed as billed. The service was submitted as telehealth based on place of service 10, but the claim line did not include the required telehealth modifier. Review the service line and submit a corrected claim if the service was rendered by synchronous audio-video telehealth.
+
+DEMO WATERMARK
+DEMO DATA - NOT REAL PHI

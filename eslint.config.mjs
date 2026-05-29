@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules/**",
+    "claimcompass-agent/.venv/**",
+    "claimcompass-agent/app/.adk/**",
   ]),
 ]);
 
