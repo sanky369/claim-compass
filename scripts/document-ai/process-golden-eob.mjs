@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { basename, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { requireMongoEnv } from "../mongodb/env.mjs";
@@ -77,6 +77,7 @@ async function createMcpClient(uri) {
       MDB_MCP_READ_ONLY: "false",
       MDB_MCP_TELEMETRY: "disabled",
       MDB_MCP_LOGGERS: "mcp",
+      PATH: [dirname(process.execPath), process.env.PATH].filter(Boolean).join(":"),
     },
     stderr: "pipe",
   });

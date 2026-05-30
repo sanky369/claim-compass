@@ -8,11 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "docai:golden-smoke": "node scripts/document-ai/process-golden-eob.mjs",
+    "playbooks:seed": "node scripts/playbooks/embed-and-seed.mjs",
+    "playbooks:create-vector-index": "node scripts/playbooks/create-vector-index.mjs",
+    "playbooks:vector-smoke": "node scripts/playbooks/vector-smoke.mjs",
     "mongodb:bootstrap": "node scripts/mongodb/bootstrap-foundation.mjs",
     "mongodb:mcp-smoke": "node scripts/mongodb/mcp-smoke.mjs",
     "mongodb:mcp-tools": "MDB_MCP_CONNECTION_STRING=${MONGODB_URI:-mongodb://localhost:27017/claimcompass} MDB_MCP_DRY_RUN=true MDB_MCP_TELEMETRY=disabled mongodb-mcp-server"
   },
   "dependencies": {
+    "@google/genai": "^2.7.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"

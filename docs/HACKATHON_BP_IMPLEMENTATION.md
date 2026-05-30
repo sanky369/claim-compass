@@ -1,6 +1,6 @@
 # ClaimCompass Hackathon Implementation Tracker
 
-Last updated: 2026-05-26
+Last updated: 2026-05-30
 
 Primary blueprint: `docs/HACKATHON_BLUEPRINT.md`
 
@@ -26,6 +26,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | Secret Manager config | `documentai-processor-id`, `documentai-location`, `gcp-project-id` created |
 | ADK scaffold | `claimcompass-agent/` created with Agents CLI on 2026-05-27 |
 | Agent Runtime hello deploy | Proven on 2026-05-27 with reasoning engine `projects/834613361298/locations/us-east1/reasoningEngines/6126513974339960832`, remote query succeeded, then deployment deleted to avoid min-instance cost |
+| Atlas Vector Search | `playbook_vec` on `claimcompass.payer_playbooks`, `READY`, queryable, verified on 2026-05-30 |
 
 ## Status Legend
 
@@ -49,8 +50,8 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 5 | MongoDB MCP integration | DONE | MCP smoke passed with `find`, `aggregate`, `insert-many`, `update-many`, and `count`. |
 | 6 | Synthetic demo data | DONE | Clean synthetic EOB PDF plus paste-text fallback exist, no PHI, no payer logos/templates. |
 | 7 | Document AI tool | DONE | PDF in Cloud Storage processes through Document AI and updates the denial doc through MongoDB MCP. |
-| 8 | Playbook chunks and embeddings | TODO | 30-60 fresh payer playbook chunks embedded with `gemini-embedding-001`. |
-| 9 | Atlas Vector Search | TODO | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
+| 8 | Playbook chunks and embeddings | DONE | 30 fresh payer playbook chunks embedded with `gemini-embedding-001`. |
+| 9 | Atlas Vector Search | DONE | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
 | 10 | PolicyAgent | TODO | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
 | 11 | RootAgent orchestration and classification | TODO | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
 | 12 | Minimal eval gate | TODO | Agents CLI eval verifies golden-path retrieval/classification before drafting/UI work. |
@@ -559,7 +560,7 @@ Resources:
 
 ## System 8: Playbook Chunks and Embeddings
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: create the knowledge base the agent retrieves from MongoDB.
 
@@ -586,9 +587,17 @@ Embedding rule:
 
 Acceptance checks:
 
-- Chunks are paraphrased, not copy-pasted payer bulletins.
-- Embedding dimensionality matches the Atlas Vector Search index.
-- Insert chunks through MCP `insert-many`.
+- DONE: 30 newly authored synthetic chunks exist for BCBS-TX Demo and Aetna Demo.
+- DONE: Coverage spans three CPT families and five denial themes.
+- DONE: Gemini `gemini-embedding-001` generated 1536-dimensional embeddings.
+- DONE: Chunks were inserted through MongoDB MCP `insert-many`.
+- DONE: `payer_playbooks` count confirms 30 embedded demo chunks.
+
+Verification:
+
+```bash
+npm run playbooks:seed
+```
 
 Resources:
 
@@ -597,14 +606,15 @@ Resources:
 
 ## System 9: Atlas Vector Search
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: prove the MongoDB track's retrieval story.
 
 Index creation path:
 
-- Primary path: create `playbook_vec` through the MongoDB MCP `create-index` tool during setup, then verify with `collection-indexes`.
-- Fallback path: create it in the Atlas UI if MCP index creation blocks, then still verify with MCP `collection-indexes`.
+- Setup path used: MongoDB Node driver `createSearchIndex` / `listSearchIndexes`.
+- Reason: MongoDB MCP `create-index` is for ordinary collection indexes; Atlas Vector Search index management is setup/migration work, which this repo permits through direct driver scripts.
+- Retrieval path remains MongoDB MCP `aggregate` with `$vectorSearch`.
 - Do not create a parallel Google vector datastore for v1.
 
 Create index:
@@ -637,12 +647,18 @@ Query pattern:
 
 Acceptance checks:
 
-- Index was created through the primary MCP path or the fallback Atlas UI path is documented.
-- `collection-indexes` confirms `playbook_vec` exists.
-- Index exists and is queryable.
-- MCP `aggregate` returns relevant chunks for golden denial.
-- Top-k includes telehealth modifier guidance for 90837.
-- README can show the exact `$vectorSearch` aggregation.
+- DONE: `playbook_vec` exists on `claimcompass.payer_playbooks`.
+- DONE: `listSearchIndexes` reports `status: READY` and `queryable: true`.
+- DONE: MCP `aggregate` with `$vectorSearch` returns 5 relevant chunks for the golden denial query.
+- DONE: Top result is `BCBS-TX: Modifier Missing for psychotherapy 90-series claims`.
+- DONE: Top result includes CPT `90837`, denial codes `CO-45`/`N179`, and bucket `corrected_claim`.
+
+Verification:
+
+```bash
+npm run playbooks:create-vector-index
+npm run playbooks:vector-smoke
+```
 
 Resources:
 

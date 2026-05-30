@@ -71,7 +71,7 @@ The submission wording is:
 
 Completed systems are tracked in
 [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
-As of the current baseline commit, Systems 0-7 are complete:
+As of the current baseline commit, Systems 0-9 are complete:
 
 - Project guardrails and docs
 - Google Cloud project and cost controls
@@ -81,12 +81,14 @@ As of the current baseline commit, Systems 0-7 are complete:
 - MongoDB MCP smoke path
 - Synthetic demo data
 - Document AI extraction with MongoDB MCP write-back
+- Gemini-embedded payer playbook chunks
+- Atlas Vector Search index and MCP `$vectorSearch` smoke path
 
 Next systems:
 
-- System 8: playbook chunks and Gemini embeddings
-- System 9: Atlas Vector Search index and query path
 - System 10: PolicyAgent retrieval through MCP
+- System 11: RootAgent orchestration and classification
+- System 12: minimal eval gate
 
 ## Local Setup
 
@@ -141,6 +143,57 @@ The smoke path verifies `find`, `aggregate`, `insert-many`, `update-many`, and
 `count` through the official MongoDB MCP Server. For this repo,
 `mongodb-mcp-server@1.11.0` exposes `update-many`, so v1 write-back uses a
 unique `denial_id` filter instead of an unavailable `update-one`.
+
+## Playbook Embeddings and Vector Search
+
+Seed the synthetic payer playbook chunks and Gemini embeddings:
+
+```bash
+npm run playbooks:seed
+```
+
+Create or verify the Atlas Vector Search index:
+
+```bash
+npm run playbooks:create-vector-index
+```
+
+Run the golden-path vector retrieval smoke test through MongoDB MCP:
+
+```bash
+npm run playbooks:vector-smoke
+```
+
+The smoke query uses an MCP `aggregate` call with this `$vectorSearch` shape:
+
+```js
+[
+  {
+    $vectorSearch: {
+      index: "playbook_vec",
+      path: "embedding",
+      queryVector: "<1536-dim gemini-embedding-001 vector>",
+      numCandidates: 30,
+      limit: 5,
+      filter: {
+        payer_id: "bcbs_tx_demo",
+        "scope.cpt_family": "psychotherapy_90_codes",
+      },
+    },
+  },
+  {
+    $project: {
+      _id: 1,
+      title: 1,
+      body: 1,
+      source_url: 1,
+      payer_id: 1,
+      scope: 1,
+      score: { $meta: "vectorSearchScore" },
+    },
+  },
+]
+```
 
 ## Document AI Smoke Test
 

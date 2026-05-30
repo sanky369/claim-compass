@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { dirname } from "node:path";
 import { requireMongoEnv } from "./env.mjs";
 
 const requiredReadTools = ["find", "aggregate", "count"];
@@ -54,6 +55,7 @@ async function main() {
       MDB_MCP_READ_ONLY: "false",
       MDB_MCP_TELEMETRY: "disabled",
       MDB_MCP_LOGGERS: "mcp",
+      PATH: [dirname(process.execPath), process.env.PATH].filter(Boolean).join(":"),
     },
     stderr: "pipe",
   });
