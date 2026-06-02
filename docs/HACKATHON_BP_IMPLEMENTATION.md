@@ -53,7 +53,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 8 | Playbook chunks and embeddings | DONE | 30 fresh payer playbook chunks embedded with `gemini-embedding-001`. |
 | 9 | Atlas Vector Search | DONE | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
 | 10 | PolicyAgent | DONE | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
-| 11 | RootAgent orchestration and classification | TODO | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
+| 11 | RootAgent orchestration and classification | DONE | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
 | 12 | Minimal eval gate | TODO | Agents CLI eval verifies golden-path retrieval/classification before drafting/UI work. |
 | 13 | DrafterAgent and citation validation | TODO | Generates corrected-claim guidance with valid playbook citations and inserts artifact. |
 | 14 | Expanded eval suite | TODO | Agents CLI eval covers drafting, citations, fallbacks, and edge cases. |
@@ -718,7 +718,7 @@ Resources:
 
 ## System 11: RootAgent Orchestration and Classification
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: own the full denial-resolution workflow.
 
@@ -743,11 +743,20 @@ Seven canonical buckets are fixed here; do not rename them later in UI/README wi
 
 Acceptance checks:
 
-- Golden denial becomes `bucket: "corrected_claim"` with confidence.
-- Denial status changes from `new` to a clear pre-draft triage state.
-- Trace events exist for every major step.
-- Errors become readable UI states, not silent failures.
-- Minimal evals can run before DrafterAgent exists.
+- DONE: Root smoke reads the golden denial through MongoDB MCP `find`.
+- DONE: Root smoke can trigger the existing Document AI tool path if extraction is missing.
+- DONE: Root smoke delegates to PolicyAgent retrieval using Gemini embeddings and MongoDB MCP `aggregate`/`find`.
+- DONE: Golden denial becomes `bucket: "corrected_claim"` with confidence `0.92`.
+- DONE: Denial status changes to `triaged_pending_artifact`.
+- DONE: Root trace events exist for `root_find_denial`, `root_policy_agent`, `root_classification`, and `root_denial_update`.
+- DONE: Errors fail loudly with readable messages, which keeps the future UI from silently swallowing failures.
+- READY: Minimal evals can run before DrafterAgent exists.
+
+Verification:
+
+```bash
+npm run root:smoke
+```
 
 Resources:
 
