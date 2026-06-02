@@ -1,6 +1,6 @@
 # ClaimCompass Hackathon Implementation Tracker
 
-Last updated: 2026-05-30
+Last updated: 2026-06-02
 
 Primary blueprint: `docs/HACKATHON_BLUEPRINT.md`
 
@@ -52,7 +52,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 7 | Document AI tool | DONE | PDF in Cloud Storage processes through Document AI and updates the denial doc through MongoDB MCP. |
 | 8 | Playbook chunks and embeddings | DONE | 30 fresh payer playbook chunks embedded with `gemini-embedding-001`. |
 | 9 | Atlas Vector Search | DONE | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
-| 10 | PolicyAgent | TODO | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
+| 10 | PolicyAgent | DONE | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
 | 11 | RootAgent orchestration and classification | TODO | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
 | 12 | Minimal eval gate | TODO | Agents CLI eval verifies golden-path retrieval/classification before drafting/UI work. |
 | 13 | DrafterAgent and citation validation | TODO | Generates corrected-claim guidance with valid playbook citations and inserts artifact. |
@@ -668,7 +668,7 @@ Resources:
 
 ## System 10: PolicyAgent
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: retrieve policy context and denial-code explanations for RootAgent.
 
@@ -696,9 +696,20 @@ Output:
 
 Acceptance checks:
 
-- No direct MongoDB driver query from the agent path.
-- Top chunks include IDs and titles for citations.
-- Handles no-result case cleanly.
+- DONE: PolicyAgent retrieval module exists in `claimcompass-agent/app/policy_agent.py`.
+- DONE: Unit tests cover chunk mapping, citation IDs/titles, no-result fallback, and CPT-family inference.
+- DONE: Live smoke uses Gemini query embedding and MongoDB MCP `aggregate` against `payer_playbooks`.
+- DONE: Live smoke uses MongoDB MCP `find` against `carc` and `rarc`.
+- DONE: Top chunk is `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`.
+- DONE: Top chunk includes title/source/scope fields for downstream citations.
+- DONE: No direct MongoDB driver query is used in the PolicyAgent retrieval path.
+
+Verification:
+
+```bash
+cd claimcompass-agent && uv run pytest tests/unit/test_policy_agent.py
+npm run policy:smoke
+```
 
 Resources:
 

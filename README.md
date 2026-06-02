@@ -71,7 +71,7 @@ The submission wording is:
 
 Completed systems are tracked in
 [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
-As of the current baseline commit, Systems 0-9 are complete:
+As of the current baseline commit, Systems 0-10 are complete:
 
 - Project guardrails and docs
 - Google Cloud project and cost controls
@@ -83,12 +83,13 @@ As of the current baseline commit, Systems 0-9 are complete:
 - Document AI extraction with MongoDB MCP write-back
 - Gemini-embedded payer playbook chunks
 - Atlas Vector Search index and MCP `$vectorSearch` smoke path
+- PolicyAgent retrieval over MCP with CARC/RARC lookups
 
 Next systems:
 
-- System 10: PolicyAgent retrieval through MCP
 - System 11: RootAgent orchestration and classification
 - System 12: minimal eval gate
+- System 13: DrafterAgent and citation validation
 
 ## Local Setup
 
@@ -162,6 +163,12 @@ Run the golden-path vector retrieval smoke test through MongoDB MCP:
 
 ```bash
 npm run playbooks:vector-smoke
+```
+
+Run the PolicyAgent retrieval smoke test:
+
+```bash
+npm run policy:smoke
 ```
 
 The smoke query uses an MCP `aggregate` call with this `$vectorSearch` shape:
