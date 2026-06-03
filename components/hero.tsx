@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
@@ -24,8 +26,8 @@ export function Hero() {
             without switching EHRs or hiring a full billing team.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href="#cta"
+            <Link
+              href="/signin?next=/demo/denials/new"
               className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-stone-900 px-7 text-sm font-semibold text-white shadow-lg shadow-stone-900/10 transition-all hover:bg-stone-800 hover:shadow-xl hover:shadow-stone-900/20"
             >
               Decode my first denial — free
@@ -42,7 +44,7 @@ export function Hero() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </a>
+            </Link>
             <a
               href="#how-it-works"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-6 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100"

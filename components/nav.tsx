@@ -28,18 +28,18 @@ export function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <a
-            href="#login"
+          <Link
+            href="/signin"
             className="hidden text-sm font-medium text-stone-600 hover:text-stone-900 md:block"
           >
             Sign in
-          </a>
-          <a
-            href="#cta"
+          </Link>
+          <Link
+            href="/signin?next=/demo/denials/new"
             className="inline-flex h-9 items-center justify-center rounded-full bg-stone-900 px-4 text-sm font-medium text-white shadow-sm transition-all hover:bg-stone-800 hover:shadow"
           >
             Decode my denial
-          </a>
+          </Link>
         </div>
       </div>
     </header>

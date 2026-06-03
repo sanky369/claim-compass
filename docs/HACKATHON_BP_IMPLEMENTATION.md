@@ -57,7 +57,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 12 | Minimal eval gate | DONE | Agents CLI eval works and ClaimCompass minimal eval verifies golden-path retrieval/classification plus safe fallbacks. |
 | 13 | DrafterAgent and citation validation | DONE | Generates corrected-claim guidance, validates playbook citations, and inserts the artifact through MongoDB MCP. |
 | 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
-| 15 | Landing page to demo route | TODO | Current landing page routes into a one-button demo gate and then the upload flow. |
+| 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | TODO | Upload/paste, trace panel, result view, citations, before/after diff, save-as-rule. |
 | 17 | Deployment integration | TODO | ADK backend deployed to Agent Runtime or fallback Cloud Run; frontend deployed to Cloud Run. |
 | 18 | Hosted dress rehearsal | TODO | Full timed hosted run succeeds, cold start measured, deterministic backup recording captured. |
@@ -887,7 +887,7 @@ Resources:
 
 ## System 15: Landing Page to Demo Route
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: connect the current public ClaimCompass landing page to the actual hackathon demo experience without burning time on production auth.
 
@@ -927,14 +927,42 @@ Sign-in gate behavior:
 - Store a simple demo session marker if needed.
 - Route to `/demo/denials/new`.
 
+Completed on 2026-06-03:
+
+- Added `app/signin/page.tsx`: single-button demo gate, branded, reuses the
+  landing visual language (gradient/grain, stone+brand palette, serif heading).
+  It reads a `next` query param, allow-lists only internal `/demo` paths to
+  avoid an open redirect, and defaults to `/demo/denials/new`.
+- Added `components/demo-gate-button.tsx` (`"use client"`): sets a lightweight,
+  non-sensitive `cc_demo=1` cookie (1 day, lax) and `router.push`es to the demo
+  flow. No Firebase/OAuth/password and no real authentication.
+- Added `app/demo/denials/new/page.tsx`: placeholder upload/paste screen for the
+  synthetic EOB. Shows upload + paste panels, the synthetic golden-path hint
+  (CPT 90837, modifier 95 missing, CO-45 + N179), a clear "System 16 builds here
+  next" notice, and the `DEMO DATA · NOT REAL PHI` + human-review disclaimers.
+  No agent execution, Document AI upload, MongoDB writes, trace, or diff yet.
+- Wired CTAs in `components/nav.tsx` (`Sign in` -> `/signin`, `Decode my denial`
+  -> `/signin?next=/demo/denials/new`) and the `components/hero.tsx` primary CTA
+  (`/signin?next=/demo/denials/new`). Marketing sections left intact.
+- No new dependencies; used inline SVGs in keeping with the existing codebase
+  (no icon library added).
+
+Verification on 2026-06-03:
+
+- `npm run lint` passed with no errors.
+- `npm run dev` served `/`, `/signin`, `/signin?next=/demo/denials/new`, and
+  `/demo/denials/new` with HTTP `200`, and the landing markup links to
+  `/signin` and `/signin?next=/demo/denials/new`. No runtime errors in the dev
+  log (only an unrelated dependency `DEP0205` deprecation warning).
+
 Acceptance checks:
 
-- From the homepage, a judge can click `Sign in` and reach the upload/paste flow within one click after the sign-in gate.
-- From the homepage, a judge can click `Decode my denial` and reach the upload/paste flow.
-- No real PHI/auth claim is made.
-- No Firebase/Auth dependency is introduced unless explicitly chosen later.
-- The transition from marketing site to demo app is clear in the 3-minute recording.
-- The whole gate takes less than half a day to implement.
+- DONE: From the homepage, a judge can click `Sign in` and reach the upload/paste flow within one click after the sign-in gate.
+- DONE: From the homepage, a judge can click `Decode my denial` (nav + hero) and reach the upload/paste flow through the one-button gate.
+- DONE: No real PHI/auth claim is made; pages carry `DEMO DATA · NOT REAL PHI` and human-review disclaimers.
+- DONE: No Firebase/Auth dependency is introduced; the gate only sets a non-sensitive `cc_demo` cookie.
+- READY: The marketing-to-demo transition is coherent for the 3-minute recording; final framing happens during System 18.
+- DONE: Implemented well within the half-day budget; `/signin` can be dropped later to route CTAs straight to `/demo/denials/new` if needed.
 
 Resources:
 

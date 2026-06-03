@@ -7,7 +7,7 @@ This review summarizes the systems completed against
 line answers whether the system is built, how it was checked, and what risk
 remains.
 
-## Systems 0-14
+## Systems 0-15
 
 | System | Status | Evidence | Remaining risk |
 |---:|---|---|---|
@@ -26,6 +26,7 @@ remains.
 | 12 | DONE | `npm run eval:agents-cli` and `npm run eval:minimal` passed. | The ADK CLI eval is still a scaffold smoke; ClaimCompass-specific gating lives in Node eval scripts. |
 | 13 | DONE | `npm run draft:smoke` generated and stored a validated `corrected_claim_guidance` artifact. | Gemini may omit required citations; the validator repairs or rejects before storage. |
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
+| 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
 
 ## Latest Verification Commands
 
@@ -38,7 +39,8 @@ npm run eval:expanded
 
 ## Current Next Build
 
-System 15 should connect the current landing page to a narrow demo route. The
-frontend should not become a broad production app yet; it only needs to prove
-the signed-in/demo handoff into the ClaimCompass golden path before System 16
-builds the trace/result UI.
+System 16 builds the actual agent demonstration UI on top of the System 15
+handoff: the real upload/paste flow at `/demo/denials/new`, the live agent
+trace panel, the result/citation view, and the MongoDB before/after diff. The
+frontend should still stay a narrow, deterministic demo workspace rather than a
+broad production app.
