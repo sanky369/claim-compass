@@ -90,8 +90,8 @@ deployment-ready but cost-gated:
 - DrafterAgent artifact generation with citation validation
 - Expanded eval suite covering drafting, citations, and safe fallbacks
 - Landing page to demo gate handoff
-- Local Next.js demonstration UI with run API, trace, result, citations,
-  MongoDB before/after diff, and save-as-rule
+- Local Next.js demonstration UI with sample PDF import, run API, trace,
+  result, citations, MongoDB before/after diff, and save-as-rule
 
 Next systems:
 
@@ -200,8 +200,8 @@ Run the local demo UI proof:
 npm run dev
 ```
 
-Then open `/demo/denials/new`, click **Run golden demo**, and inspect
-`/demo/denials/demo_denial_001`.
+Then open `/demo/denials/new`, open the displayed sample PDF, click
+**Import sample PDF and run**, and inspect `/demo/denials/demo_denial_001`.
 
 Deployment notes live in
 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The deploy helper is guarded and

@@ -35,4 +35,4 @@ gcloud run deploy "${SERVICE}" \
   --memory 1Gi \
   --timeout 300 \
   --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=global,MONGODB_DATABASE=claimcompass" \
-  --update-secrets "MONGODB_URI=mongodb-uri:latest,DOCUMENT_AI_PROCESSOR_ID=documentai-processor-id:latest,DOCUMENT_AI_LOCATION=documentai-location:latest"
+  --update-secrets "MONGODB_URI=mongodb-uri:latest,DOCUMENT_AI_PROCESSOR_ID=documentai-processor-id:latest,DOCUMENT_AI_LOCATION=documentai-location:latest,GCS_UPLOAD_BUCKET=gcs-upload-bucket:latest"

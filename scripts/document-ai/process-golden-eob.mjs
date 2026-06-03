@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -20,6 +21,11 @@ function gcloud(args, options = {}) {
 }
 
 function getSecret(name) {
+  const envName = name.toUpperCase().replaceAll("-", "_");
+  if (process.env[envName]) {
+    return process.env[envName];
+  }
+
   return gcloud([
     "secrets",
     "versions",
@@ -28,6 +34,32 @@ function getSecret(name) {
     `--secret=${name}`,
     `--project=${projectId}`,
   ]);
+}
+
+async function getAccessToken() {
+  if (process.env.GOOGLE_OAUTH_ACCESS_TOKEN) {
+    return process.env.GOOGLE_OAUTH_ACCESS_TOKEN;
+  }
+
+  try {
+    const response = await fetch(
+      "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+      {
+        headers: { "Metadata-Flavor": "Google" },
+        signal: AbortSignal.timeout(2000),
+      },
+    );
+    if (response.ok) {
+      const body = await response.json();
+      if (body.access_token) {
+        return body.access_token;
+      }
+    }
+  } catch {
+    // Local development falls through to gcloud ADC.
+  }
+
+  return gcloud(["auth", "print-access-token"]);
 }
 
 function extractFields(rawText) {
@@ -149,7 +181,7 @@ function assertMcpOk(result, label) {
 async function processDocument(gcsUri) {
   const processorId = getSecret("documentai-processor-id");
   const location = getSecret("documentai-location");
-  const token = gcloud(["auth", "print-access-token"]);
+  const token = await getAccessToken();
   const endpoint = `https://${location}-documentai.googleapis.com/v1/projects/${projectId}/locations/${location}/processors/${processorId}:process`;
 
   const response = await fetch(endpoint, {
@@ -175,13 +207,32 @@ async function processDocument(gcsUri) {
   return body.document;
 }
 
+async function uploadObjectToGcs(bucket, objectName, filePath) {
+  const token = await getAccessToken();
+  const endpoint = `https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=media&name=${encodeURIComponent(objectName)}`;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/pdf",
+    },
+    body: readFileSync(filePath),
+  });
+
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(`GCS upload failed (${response.status}): ${JSON.stringify(body)}`);
+  }
+  return body;
+}
+
 async function main() {
   const { uri } = requireMongoEnv();
   const bucket = getSecret("gcs-upload-bucket");
   const objectName = `synthetic-eobs/${Date.now()}-${basename(localPdf)}`;
   const gcsUri = `gs://${bucket}/${objectName}`;
 
-  gcloud(["storage", "cp", localPdf, gcsUri], { stdio: ["ignore", "pipe", "pipe"] });
+  await uploadObjectToGcs(bucket, objectName, localPdf);
 
   const { client, transport } = await createMcpClient(uri);
   try {

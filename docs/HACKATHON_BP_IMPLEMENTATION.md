@@ -1013,11 +1013,12 @@ Design constraints:
 
 Acceptance checks:
 
-- DONE: `/demo/denials/new` has a one-click synthetic golden run action and paste fallback marker.
-- DONE: `POST /api/demo/run` starts the existing RootAgent -> DrafterAgent path and stores a `demo_runs` before/after snapshot.
+- DONE: `/demo/denials/new` has a visible sample PDF import card, "Open sample PDF" link, one-click Document AI import/run action, seeded-extraction fallback, and paste fallback marker.
+- DONE: `GET /api/demo/sample-pdf` serves the exact synthetic PDF being uploaded: `golden-bcbs-tx-90837-missing-modifier-eob.pdf`.
+- DONE: `POST /api/demo/run` with `mode: "sample_pdf"` uploads the sample PDF to GCS, processes it with Document AI, then starts the existing RootAgent -> DrafterAgent path and stores a `demo_runs` before/after snapshot.
 - DONE: `/demo/denials/demo_denial_001` shows workflow metrics, agent trace, corrected-claim result, citation chips, generated artifact, MongoDB before/after diff, and save-as-rule.
 - DONE: `POST /api/demo/rules` inserts a synthetic `billing_rules` document and trace event.
-- DONE: Trace view visibly includes Document AI extraction context, Gemini/MongoDB MCP retrieval/classification, DrafterAgent generation, and MongoDB write-back.
+- DONE: Trace/result view visibly includes source PDF filename, GCS URI, Document AI extraction context, Gemini/MongoDB MCP retrieval/classification, DrafterAgent generation, and MongoDB write-back.
 - DONE: Client code does not receive Atlas URI or Google secrets; server-only route handlers perform secret-backed work.
 
 Verification:
@@ -1026,14 +1027,16 @@ Verification:
 npm run lint
 npm run build
 POST http://localhost:3000/api/demo/run
+GET  http://localhost:3000/api/demo/sample-pdf
 POST http://localhost:3000/api/demo/rules
 GET  http://localhost:3000/demo/denials/demo_denial_001
 ```
 
 Latest local proof:
 
-- `POST /api/demo/run` returned `200`, generated `run_1780507842760_ba8eaa13`, and redirected to `/demo/denials/demo_denial_001?run=run_1780507842760_ba8eaa13`.
-- Result page contained agent trace, MongoDB diff, save-as-rule UI, demo-data marker, and playbook citation `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`.
+- `GET /api/demo/sample-pdf` returned `200`, `application/pdf`, and `%PDF` bytes for `golden-bcbs-tx-90837-missing-modifier-eob.pdf`.
+- `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`, generated `run_1780508743966_8e77bbf7`, uploaded the sample PDF, and redirected to `/demo/denials/demo_denial_001?run=run_1780508743966_8e77bbf7`.
+- Result page contained source PDF filename, GCS URI, agent trace, MongoDB diff, save-as-rule UI, demo-data marker, and playbook citation `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`.
 - `POST /api/demo/rules` returned `200` and created `rule_1780507856518_71df3334`.
 
 Resources:
@@ -1067,7 +1070,7 @@ Acceptance checks:
 - DONE: Added `.gcloudignore` so local secrets, `.next`, `node_modules`, `.venv`, and bulky docs are excluded from Cloud Run source upload.
 - DONE: Added `scripts/deploy/cloud-run-frontend.sh`, guarded by `CONFIRM_CLOUD_RUN_DEPLOY=yes`.
 - DONE: Deploy helper defaults to `min-instances=0`, `max-instances=2`, and Secret Manager env vars.
-- DONE: Required secrets `mongodb-uri`, `documentai-processor-id`, and `documentai-location` exist in project `claimcompass-497412`.
+- DONE: Required secrets `mongodb-uri`, `documentai-processor-id`, `documentai-location`, and `gcs-upload-bucket` exist in project `claimcompass-497412`.
 - DONE: Runtime dependencies needed by server route handlers and MCP scripts were moved to production dependencies.
 - BLOCKED: Actual hosted deploy is intentionally not run until explicit cost approval, because Cloud Run, Cloud Build, Artifact Registry, Gemini, Document AI, and egress can create billable usage.
 
@@ -1079,7 +1082,7 @@ CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
 
 Notes:
 
-- The hosted System 16 path relies on the already-extracted synthetic denial. `scripts/document-ai/process-golden-eob.mjs` still shells out to `gcloud`; do not rely on hosted Document AI re-processing until that script is refactored to use metadata-server credentials or first-party Google client libraries.
+- The sample-PDF path now uses env/metadata credentials first and local `gcloud` only as a fallback, so it is prepared for Cloud Run. Cloud Run service account permissions still need to be verified during hosted deployment.
 - Keep `min-instances=0` until final recording QA. Set `min-instances=1` only briefly if cold start is too slow, then scale back.
 
 Resources:

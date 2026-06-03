@@ -24,12 +24,14 @@ These exist in Secret Manager and are referenced by the deployment script:
 - `mongodb-uri` -> exposed as `MONGODB_URI`
 - `documentai-processor-id` -> exposed as `DOCUMENT_AI_PROCESSOR_ID`
 - `documentai-location` -> exposed as `DOCUMENT_AI_LOCATION`
+- `gcs-upload-bucket` -> exposed as `GCS_UPLOAD_BUCKET`
 
-The deployed demo route currently depends on the already-extracted synthetic
-golden denial. `scripts/document-ai/process-golden-eob.mjs` still shells out to
-`gcloud` for Secret Manager and access tokens, so do not rely on hosted
-Document AI re-processing until that script is refactored to use first-party
-Google client libraries or metadata-server credentials.
+The deployed sample-PDF route uses the synthetic golden PDF committed under
+`docs/test-documents/pdf/`. It uploads that known file to the configured GCS
+bucket through the Google Cloud Storage JSON API, processes it with Document AI,
+and then runs RootAgent/DrafterAgent. The script reads secrets from Cloud Run
+environment variables first and falls back to local `gcloud` only for local
+development.
 
 ## Guarded Deploy
 
@@ -73,9 +75,11 @@ Manual browser flow:
 1. `/`
 2. `/signin`
 3. `/demo/denials/new`
-4. Click **Run golden demo**
-5. Confirm `/demo/denials/demo_denial_001` shows:
+4. Open the linked sample PDF.
+5. Click **Import sample PDF and run**
+6. Confirm `/demo/denials/demo_denial_001` shows:
    - Agent trace
+   - Source PDF filename and GCS URI
    - Corrected-claim result
    - Citation chips
    - MongoDB before/after diff

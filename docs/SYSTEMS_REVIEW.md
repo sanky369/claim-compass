@@ -27,8 +27,8 @@ remains.
 | 13 | DONE | `npm run draft:smoke` generated and stored a validated `corrected_claim_guidance` artifact. | Gemini may omit required citations; the validator repairs or rejects before storage. |
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
-| 16 | DONE | `POST /api/demo/run` returned `200`; result page shows trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. `npm run lint` and `npm run build` pass. | Uses the synthetic golden denial only; hosted Document AI re-processing is not refactored yet. |
-| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified. | Actual Cloud Run deploy is pending explicit cost approval. |
+| 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
+| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval and Cloud Run service account IAM verification. |
 
 ## Latest Verification Commands
 

@@ -4,22 +4,38 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type RunState = "idle" | "running" | "error";
+type RunMode = "sample_pdf" | "seeded_extraction";
 
 const runningSteps = [
-  "Load synthetic EOB and denial record",
+  "Upload selected sample PDF to Cloud Storage",
+  "Process with Google Document AI",
   "Run RootAgent retrieval and classification",
   "Generate corrected-claim guidance",
   "Write artifact and trace back to MongoDB",
 ];
+
+const seededRunningSteps = [
+  "Load already-extracted synthetic denial",
+  "Run RootAgent retrieval and classification",
+  "Generate corrected-claim guidance",
+  "Write artifact and trace back to MongoDB",
+];
+
+const samplePdfName = "golden-bcbs-tx-90837-missing-modifier-eob.pdf";
+const samplePdfPath = "docs/test-documents/pdf/golden-bcbs-tx-90837-missing-modifier-eob.pdf";
 
 export function DemoRunner() {
   const router = useRouter();
   const [state, setState] = useState<RunState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [pasteText, setPasteText] = useState("");
+  const [runningMode, setRunningMode] = useState<RunMode | null>(null);
+  const activeSteps =
+    runningMode === "seeded_extraction" ? seededRunningSteps : runningSteps;
 
-  async function startRun() {
+  async function startRun(mode: RunMode) {
     setState("running");
+    setRunningMode(mode);
     setError(null);
 
     const response = await fetch("/api/demo/run", {
@@ -27,13 +43,14 @@ export function DemoRunner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         denialId: "demo_denial_001",
-        mode: pasteText.trim() ? "paste_fallback" : "golden_pdf",
+        mode,
       }),
     });
     const payload = await response.json();
 
     if (!response.ok || !payload.ok) {
       setState("error");
+      setRunningMode(null);
       setError(payload.error || "The demo run failed.");
       return;
     }
@@ -49,20 +66,47 @@ export function DemoRunner() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-700">
               1
             </span>
-            Synthetic EOB route
+            Sample PDF import
           </div>
           <p className="mt-3 text-sm leading-relaxed text-stone-600">
-            Runs the already-seeded BCBS-TX demo denial through Document AI
-            context, Gemini retrieval/classification, MongoDB MCP write-back,
-            and DrafterAgent citation validation.
+            Uploads the known synthetic PDF to the configured GCS bucket,
+            processes it with Google Document AI, then runs Gemini retrieval,
+            MongoDB MCP write-back, and DrafterAgent citation validation.
           </p>
+          <div className="mt-4 rounded-xl bg-stone-50 p-3 ring-1 ring-inset ring-stone-200">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+              PDF selected for upload
+            </p>
+            <p className="mt-1 break-words text-sm font-medium text-stone-900">
+              {samplePdfName}
+            </p>
+            <p className="mt-1 break-words text-xs text-stone-500">{samplePdfPath}</p>
+            <a
+              href="/api/demo/sample-pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex text-xs font-semibold text-brand-700 hover:text-brand-900"
+            >
+              Open sample PDF
+            </a>
+          </div>
           <button
             type="button"
-            onClick={startRun}
+            onClick={() => startRun("sample_pdf")}
             disabled={state === "running"}
             className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-stone-900 px-5 text-sm font-semibold text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-65"
           >
-            {state === "running" ? "Running agent..." : "Run golden demo"}
+            {state === "running" && runningMode === "sample_pdf"
+              ? "Importing PDF..."
+              : "Import sample PDF and run"}
+          </button>
+          <button
+            type="button"
+            onClick={() => startRun("seeded_extraction")}
+            disabled={state === "running"}
+            className="mt-3 inline-flex h-10 items-center justify-center rounded-full border border-stone-300 bg-white px-5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-65"
+          >
+            Run from seeded extraction
           </button>
         </section>
 
@@ -75,7 +119,8 @@ export function DemoRunner() {
           </div>
           <p className="mt-3 text-sm leading-relaxed text-stone-600">
             Optional for the demo script. Do not paste real PHI. System 16 keeps
-            the backend fixed to the synthetic golden claim for safety.
+            the backend fixed to the synthetic golden claim for safety, but this
+            marker lets the presenter explain the fallback flow.
           </p>
           <textarea
             value={pasteText}
@@ -89,10 +134,12 @@ export function DemoRunner() {
       {state === "running" ? (
         <section className="rounded-2xl border border-brand-200 bg-brand-50/70 p-5">
           <p className="text-sm font-semibold text-stone-900">
-            Agent run in progress
+            {runningMode === "sample_pdf"
+              ? "Sample PDF import in progress"
+              : "Agent run in progress"}
           </p>
           <div className="mt-4 grid gap-2 md:grid-cols-4">
-            {runningSteps.map((step, index) => (
+            {activeSteps.map((step, index) => (
               <div
                 key={step}
                 className="rounded-xl border border-brand-200 bg-white px-3 py-3 text-xs text-stone-600"

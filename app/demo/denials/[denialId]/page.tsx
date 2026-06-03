@@ -93,6 +93,10 @@ export default async function DenialResultPage({
   const chunks = denial.policy_context?.chunks || [];
   const beforeDiff = summarizeDenialForDiff(demoRun?.before || null);
   const afterDiff = summarizeDenialForDiff(demoRun?.after || denial);
+  const sourceDocument = String(
+    denial.source_document || "golden-bcbs-tx-90837-missing-modifier-eob.pdf",
+  );
+  const gcsUri = typeof denial.gcs_uri === "string" ? denial.gcs_uri : null;
 
   return (
     <main className="min-h-screen bg-stone-50">
@@ -194,6 +198,21 @@ export default async function DenialResultPage({
                     {chunk._id}
                   </span>
                 ))}
+              </div>
+              <div className="mt-5 rounded-xl bg-stone-50 p-3 ring-1 ring-inset ring-stone-200">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+                  Source PDF imported
+                </p>
+                <p className="mt-1 break-words text-sm font-medium text-stone-900">
+                  {sourceDocument}
+                </p>
+                {gcsUri ? (
+                  <p className="mt-1 break-words text-xs text-stone-500">{gcsUri}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-stone-500">
+                    Seeded extraction path; no fresh GCS URI in this run.
+                  </p>
+                )}
               </div>
             </div>
 

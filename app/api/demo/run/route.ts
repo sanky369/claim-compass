@@ -35,6 +35,7 @@ async function runNpmScript(script: string, denialId: string) {
 export async function POST(request: Request) {
   const startedAt = Date.now();
   const body = await request.json().catch(() => ({}));
+  const mode = body.mode === "sample_pdf" ? "sample_pdf" : "seeded_extraction";
   const denialId =
     typeof body.denialId === "string" && body.denialId.trim()
       ? body.denialId.trim()
@@ -54,6 +55,8 @@ export async function POST(request: Request) {
   try {
     const db = await getMongoDb();
     const before = await getDemoDenial(denialId);
+    const documentAi =
+      mode === "sample_pdf" ? await runNpmScript("docai:golden-smoke", denialId) : null;
     const root = await runNpmScript("root:smoke", denialId);
     const draft = await runNpmScript("draft:smoke", denialId);
     const after = await getDemoDenial(denialId);
@@ -67,8 +70,10 @@ export async function POST(request: Request) {
       started_at: new Date(startedAt).toISOString(),
       completed_at: now,
       elapsed_ms: Date.now() - startedAt,
+      mode,
       before,
       after,
+      document_ai_summary: documentAi,
       root_summary: root,
       draft_summary: draft,
       created_at: now,
@@ -79,6 +84,11 @@ export async function POST(request: Request) {
       denial_id: denialId,
       run_id: runId,
       artifact_id: draft.artifact_id,
+      mode,
+      source_document:
+        mode === "sample_pdf"
+          ? "golden-bcbs-tx-90837-missing-modifier-eob.pdf"
+          : "seeded_extraction",
       elapsed_ms: Date.now() - startedAt,
       redirect_to: `/demo/denials/${denialId}?run=${runId}`,
     });
