@@ -59,10 +59,10 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
 | 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | DONE | Upload/paste start, trace panel, result view, citations, before/after diff, and save-as-rule work locally. |
-| 17 | Deployment integration | PARTIAL | Cloud Run deployment files and guarded deploy script exist; hosted deploy is pending explicit cost approval. |
-| 18 | Hosted dress rehearsal | TODO | Full timed hosted run succeeds, cold start measured, deterministic backup recording captured. |
-| 19 | README and submission assets | TODO | Judge-readable README, architecture image, demo script, screenshots, public repo/license. |
-| 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description. |
+| 17 | Deployment integration and runtime honesty | PARTIAL | Cloud Run deployment files exist; hosted deploy, Cloud Run IAM, Atlas connectivity, and final ADK/Agent Runtime claim need proof before submission. |
+| 18 | Hosted dress rehearsal and UI polish | TODO | Full timed hosted sample-PDF run succeeds twice, cold start measured, confusing fallback UI removed or renamed, deterministic backup recording captured. |
+| 19 | README and submission assets | TODO | Judge-readable README, architecture image, screenshots, Devpost copy, repo/license, and honest runtime wording are complete. |
+| 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description, and synthetic-data safety message submitted. |
 
 ## Calendar and Pacing
 
@@ -82,9 +82,9 @@ Internal target: **June 10, 2026 at 12:00 PM Europe/London**, leaving a 34-hour 
 | June 3 | Systems 12-14 | Minimal eval, DrafterAgent artifact, citation validation, and expanded evals pass. |
 | June 4 | System 15 start / buffer | Begin landing-to-demo flow, or use as recovery buffer if eval drift appears. |
 | June 5-6 | Systems 15-16 | Landing-to-demo flow and agent demonstration UI work locally. |
-| June 7 | System 17 | Hosted backend and frontend integration works. |
-| June 8 | System 18 | Full hosted dress rehearsal and backup recording complete. |
-| June 9 | System 19 | README, screenshots, Devpost copy, and repo polish complete. |
+| June 7 | System 17 | Hosted sample-PDF path works, Cloud Run service account permissions are verified, Atlas connectivity is documented, and ADK/Agent Runtime wording is truthful. |
+| June 8 | System 18 | Full hosted dress rehearsal, UI polish pass, cold-start decision, and backup recording complete. |
+| June 9 | System 19 | README, screenshots, Devpost copy, architecture image, and repo polish complete. |
 | June 10 | System 20 | Final video and submission uploaded by internal deadline. |
 | June 11 | Buffer only | No new feature work unless submission is already safe. |
 
@@ -1044,11 +1044,12 @@ Resources:
 - Next.js local docs per `AGENTS.md`: `node_modules/next/dist/docs/`
 - Cloud Run Next.js/custom service hosting: https://cloud.google.com/run/docs/quickstarts
 
-## System 17: Deployment Integration
+## System 17: Deployment Integration and Runtime Honesty
 
 Status: `PARTIAL`
 
-Purpose: produce stable hosted URLs for Devpost and demo recording.
+Purpose: produce stable hosted URLs for Devpost and demo recording, and make
+sure the final stack claim is true.
 
 Target shape:
 
@@ -1063,6 +1064,19 @@ Steps:
 3. Configure secrets/environment.
 4. Set Cloud Run `min-instances=1` only for recording/submission QA.
 5. Scale back after submission.
+6. Resolve the ADK/Agent Runtime honesty gap before writing final submission
+   copy:
+   - Option A: wire `claimcompass-agent/app/agent.py` to the real ClaimCompass
+     golden-path workflow and prove it through eval/deploy evidence.
+   - Option B: keep the hosted demo on the Cloud Run API shim, and make
+     README/Devpost/video wording explicit that ADK/Agents CLI and Agent
+     Runtime were used as scaffold/proof, while Cloud Run hosts the demo API.
+   - The final submission must not imply the weather/time scaffold is the
+     ClaimCompass production agent.
+7. Decide and document Cloud Run -> Atlas network access:
+   - temporary hackathon allowlist such as `0.0.0.0/0`, if accepted for speed;
+   - or static egress through Serverless VPC Access / NAT, if cost and time are
+     approved.
 
 Acceptance checks:
 
@@ -1073,6 +1087,18 @@ Acceptance checks:
 - DONE: Required secrets `mongodb-uri`, `documentai-processor-id`, `documentai-location`, and `gcs-upload-bucket` exist in project `claimcompass-497412`.
 - DONE: Runtime dependencies needed by server route handlers and MCP scripts were moved to production dependencies.
 - BLOCKED: Actual hosted deploy is intentionally not run until explicit cost approval, because Cloud Run, Cloud Build, Artifact Registry, Gemini, Document AI, and egress can create billable usage.
+- TODO: Hosted `/api/health` returns `ok` on Cloud Run.
+- TODO: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
+  Cloud Run URL, not only localhost.
+- TODO: Cloud Run service account can read Secret Manager, upload to GCS, call
+  Document AI, call Gemini/Vertex APIs, and reach Atlas.
+- TODO: Atlas connectivity choice is written in `docs/DEPLOYMENT.md`, including
+  cost/security tradeoff and cleanup step if a broad temporary allowlist is
+  used.
+- TODO: ADK/Agent Runtime claim is either made true with a real ClaimCompass ADK
+  path, or softened everywhere before Devpost submission.
+- TODO: No final README, Devpost copy, or video script presents the placeholder
+  ADK weather/time scaffold as the production ClaimCompass agent.
 
 Prepared command:
 
@@ -1090,19 +1116,21 @@ Resources:
 - ADK deploy to Agent Runtime: https://adk.dev/deploy/agent-runtime/
 - Cloud Run deploy: https://cloud.google.com/run/docs/deploying
 - Secret Manager with Cloud Run: https://cloud.google.com/run/docs/configuring/services/secrets
+- Serverless VPC Access: https://cloud.google.com/vpc/docs/serverless-vpc-access
 
-## System 18: Hosted Dress Rehearsal
+## System 18: Hosted Dress Rehearsal and UI Polish
 
 Status: `TODO`
 
-Purpose: create the actual ship gate before final recording and Devpost submission.
+Purpose: create the actual ship gate before final recording and Devpost
+submission.
 
 Run on hosted URLs only:
 
 1. Open landing page.
 2. Click `Sign in` or `Decode my denial`.
 3. Continue through demo gate.
-4. Upload synthetic EOB or use paste fallback.
+4. Open the visible sample PDF, then run the sample-PDF import path.
 5. Watch trace panel complete.
 6. Confirm result page.
 7. Confirm MongoDB before/after diff.
@@ -1121,10 +1149,17 @@ Measurements:
 Acceptance checks:
 
 - Full hosted run succeeds twice in a row.
+- Hosted sample-PDF flow shows the exact PDF filename, local sample path, and
+  GCS URI so judges understand what was processed.
 - Backup recording exists before final recording day.
 - Cold start is acceptable or Cloud Run `min-instances=1` is temporarily enabled for recording.
 - No secrets, real patient data, payer logos, or private IDs appear in the video.
-- If anything fails, fallback paste-text path still completes the demo.
+- Any fallback UI that is not truly part of the demo is removed, renamed, or
+  visually de-emphasized before recording.
+- Trace panel, result page, citations, and MongoDB before/after diff are legible
+  on a laptop-width browser window.
+- If anything fails, seeded extraction fallback still completes the demo without
+  inviting real PHI paste/upload.
 
 Resources:
 
@@ -1147,7 +1182,8 @@ README must include:
   - MCP tools
   - Vector Search index
   - `$vectorSearch` aggregation
-- Google Cloud Agent Builder / ADK / Agent Runtime wording.
+- Google Cloud Agent Builder / ADK / Agent Runtime wording that matches the
+  actually proven runtime path.
 - One-command local run.
 - Sample denial -> expected output.
 - Apache-2.0 license.
@@ -1159,13 +1195,23 @@ Submission assets:
 - 3-minute demo video.
 - MongoDB track selected.
 - Devpost long-form description.
-- Screenshots of trace panel and before/after diff.
+- Screenshots of sample PDF import, trace panel, result citations, and
+  before/after diff.
 
 Acceptance checks:
 
 - README does not reference pre-hackathon code/assets as submitted work.
 - README states all AI runtime components are Google Cloud.
 - README makes MongoDB MCP and Atlas Vector Search impossible to miss.
+- README and Devpost copy make the MongoDB role impossible to miss: official
+  MongoDB MCP tools, `payer_playbooks`, `$vectorSearch`, trace inserts,
+  artifact inserts, and save-as-rule write-back.
+- Runtime language is honest: claim Agent Runtime only if a real ClaimCompass
+  ADK agent path is deployed/proven; otherwise describe the deployed demo as a
+  Cloud Run API shim backed by Google AI services, with ADK/Agents CLI scaffold
+  and eval proof.
+- Architecture image shows Document AI, Gemini, MongoDB Atlas Vector Search,
+  MongoDB MCP, Cloud Run UI/API, and optional ADK/Agent Runtime proof path.
 
 Resources:
 
@@ -1182,7 +1228,7 @@ Video structure:
 
 1. 0:00-0:15 title and stack.
 2. 0:15-0:35 problem framing.
-3. 0:35-0:50 upload/paste golden denial.
+3. 0:35-0:50 open the synthetic sample PDF and start sample-PDF import.
 4. 0:50-1:50 trace panel.
 5. 1:50-2:15 result page.
 6. 2:15-2:40 MongoDB before/after diff.
@@ -1197,6 +1243,10 @@ Acceptance checks:
 - Hosted URL is stable.
 - Repo is public and licensed.
 - Devpost selects MongoDB track.
+- Video says the document is synthetic demo data and not real PHI.
+- Video shows the sample PDF filename/GCS URI, citations, MCP/vector trace, and
+  write-back proof.
+- Video stack claim matches System 17's runtime honesty decision.
 
 Resources:
 
@@ -1213,10 +1263,16 @@ Read docs/HACKATHON_BP_IMPLEMENTATION.md first, then docs/HACKATHON_BLUEPRINT.md
 Follow the master build sequence. Do not use non-Google AI at runtime.
 Use Google ADK / Agents CLI for the backend, Agent Runtime / Vertex AI Agent Engine for final deployment, Cloud Run for the Next.js frontend, Document AI for extraction, and MongoDB Atlas + official MongoDB MCP Server for all agent DB reads/writes and vector search.
 Before changing code, report the current system number/status and the exact acceptance checks you are working toward.
+Current next priority: finish System 17 by deploying the hosted Cloud Run path
+after explicit cost approval, verifying hosted sample-PDF processing, and
+resolving the ADK/Agent Runtime honesty decision before final README/Devpost
+copy.
 ```
 
 ## Immediate Next Step
 
-Start with **System 1 verification** and **System 2 `.agents-cli-spec.md`**.
+Finish **System 17: Deployment Integration and Runtime Honesty**.
 
-Do not scaffold the agent until `.agents-cli-spec.md` exists and has been reviewed against the blueprint.
+Do not move to final submission assets until the hosted sample-PDF flow works
+from Cloud Run and the README/Devpost/video wording truthfully matches the
+runtime path we can prove.

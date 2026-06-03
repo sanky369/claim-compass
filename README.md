@@ -72,7 +72,10 @@ The submission wording is:
 Completed systems are tracked in
 [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
 As of the current baseline commit, Systems 0-16 are complete, and System 17 is
-deployment-ready but cost-gated:
+deployment-ready but cost-gated. System 17 also now carries the final runtime
+honesty gate: before submission, the project must either prove a real
+ClaimCompass ADK/Agent Runtime path or describe the hosted demo as Cloud Run API
+infrastructure backed by Google AI services, without overclaiming the scaffold.
 
 - Project guardrails and docs
 - Google Cloud project and cost controls
@@ -95,9 +98,10 @@ deployment-ready but cost-gated:
 
 Next systems:
 
-- System 17: deploy to Cloud Run after explicit cost approval
-- System 18: hosted dress rehearsal
-- System 19: README/submission assets
+- System 17: deploy to Cloud Run after explicit cost approval, verify hosted
+  sample-PDF processing, Cloud Run IAM, Atlas connectivity, and runtime wording
+- System 18: hosted dress rehearsal and UI polish
+- System 19: README/submission assets with honest stack claims
 
 ## Local Setup
 

@@ -7,7 +7,7 @@ This review summarizes the systems completed against
 line answers whether the system is built, how it was checked, and what risk
 remains.
 
-## Systems 0-15
+## Systems 0-17
 
 | System | Status | Evidence | Remaining risk |
 |---:|---|---|---|
@@ -28,7 +28,7 @@ remains.
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
 | 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
-| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval and Cloud Run service account IAM verification. |
+| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval, Cloud Run service account IAM verification, Atlas connectivity proof, and the ADK/Agent Runtime honesty decision. |
 
 ## Latest Verification Commands
 
@@ -43,6 +43,7 @@ npm run build
 
 ## Current Next Build
 
-System 17 needs a cost-approved Cloud Run deploy, followed by System 18 hosted
-dress rehearsal. Keep `min-instances=0` until final recording QA unless cold
-start is unacceptable.
+System 17 needs a cost-approved Cloud Run deploy, hosted sample-PDF verification,
+Cloud Run service account IAM checks, Atlas connectivity proof, and a final
+ADK/Agent Runtime honesty decision. Keep `min-instances=0` until final recording
+QA unless cold start is unacceptable.
