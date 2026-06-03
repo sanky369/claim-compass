@@ -15,8 +15,8 @@ const DEFAULT_NEXT = "/demo/denials/new";
  * Only allow internal demo paths so the `next` param can never become an
  * open redirect. Anything else falls back to the upload flow.
  */
-function safeNext(value?: string): string {
-  if (value && value.startsWith("/demo")) return value;
+export function safeNext(value?: string): string {
+  if (value === "/demo" || value?.startsWith("/demo/")) return value;
   return DEFAULT_NEXT;
 }
 
