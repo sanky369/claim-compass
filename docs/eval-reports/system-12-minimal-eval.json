@@ -1,0 +1,129 @@
+{
+  "ok": true,
+  "system": 12,
+  "name": "minimal_eval_gate",
+  "created_at": "2026-06-03T16:09:56.134Z",
+  "elapsed_ms": 20885,
+  "notes": [
+    "agents-cli eval run was verified separately against the ADK scaffold.",
+    "This eval gates the real ClaimCompass RootAgent/MongoDB/Gemini smoke path."
+  ],
+  "cases": [
+    {
+      "id": "golden_denial_retrieves_and_classifies",
+      "description": "Golden denial retrieves telehealth modifier chunks and classifies corrected_claim.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "RootAgent smoke completed.",
+          "details": true
+        },
+        {
+          "pass": true,
+          "message": "Bucket is corrected_claim.",
+          "details": "corrected_claim"
+        },
+        {
+          "pass": true,
+          "message": "Golden path confidence is high.",
+          "details": 0.92
+        },
+        {
+          "pass": true,
+          "message": "Retrieved chunks include modifier-missing guidance.",
+          "details": [
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+          ]
+        },
+        {
+          "pass": true,
+          "message": "Denial is ready for drafting.",
+          "details": "triaged_pending_artifact"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "weak_playbook_retrieval_falls_back",
+      "description": "No retrieved chunks stay low-confidence.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "Weak retrieval does not auto-correct.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "Weak retrieval stays low confidence.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "Weak retrieval keeps human review required.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "ambiguous_denial_codes_fall_back",
+      "description": "Golden codes without missing-modifier evidence stay review-gated.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "Ambiguous evidence does not auto-correct.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "Ambiguous evidence stays low confidence.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "Ambiguous evidence keeps human review required.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "report_path": "/Users/sanketdongre/Documents/Projects/ClaimCompass/docs/eval-reports/system-12-minimal-eval.json"
+}

@@ -1,0 +1,242 @@
+{
+  "ok": true,
+  "system": 14,
+  "name": "expanded_eval_suite",
+  "created_at": "2026-06-03T16:10:30.553Z",
+  "elapsed_ms": 34230,
+  "root_summary": {
+    "denial_id": "demo_denial_001",
+    "bucket": "corrected_claim",
+    "status": "triaged_pending_artifact",
+    "retrieved_chunk_ids": [
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+    ]
+  },
+  "draft_summary": {
+    "denial_id": "demo_denial_001",
+    "artifact_id": "artifact_demo_denial_001_1780503028068_824632e3",
+    "citation_ids": [
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+    ],
+    "model": "gemini-flash-latest"
+  },
+  "cases": [
+    {
+      "id": "golden_path_root_still_passes",
+      "description": "RootAgent still returns the golden corrected-claim bucket.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "RootAgent smoke completed.",
+          "details": true
+        },
+        {
+          "pass": true,
+          "message": "Golden path bucket is corrected_claim.",
+          "details": "corrected_claim"
+        },
+        {
+          "pass": true,
+          "message": "RootAgent returned playbook chunks.",
+          "details": [
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+            "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+          ]
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "drafter_artifact_is_grounded",
+      "description": "DrafterArtifact has valid citations and human review language.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "Drafter smoke completed.",
+          "details": true
+        },
+        {
+          "pass": true,
+          "message": "No invalid citations.",
+          "details": {
+            "ok": true,
+            "citations": [
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+            ],
+            "invalid_citations": [],
+            "forbidden_matches": [],
+            "has_human_review_disclaimer": true,
+            "gemini_output_required_repair": true,
+            "original_validation": {
+              "ok": false,
+              "citations": [],
+              "invalid_citations": [],
+              "forbidden_matches": [],
+              "has_human_review_disclaimer": false
+            }
+          }
+        },
+        {
+          "pass": true,
+          "message": "No invented payer address/deadline/medical necessity facts.",
+          "details": {
+            "ok": true,
+            "citations": [
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+            ],
+            "invalid_citations": [],
+            "forbidden_matches": [],
+            "has_human_review_disclaimer": true,
+            "gemini_output_required_repair": true,
+            "original_validation": {
+              "ok": false,
+              "citations": [],
+              "invalid_citations": [],
+              "forbidden_matches": [],
+              "has_human_review_disclaimer": false
+            }
+          }
+        },
+        {
+          "pass": true,
+          "message": "Human-review disclaimer exists.",
+          "details": {
+            "ok": true,
+            "citations": [
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+            ],
+            "invalid_citations": [],
+            "forbidden_matches": [],
+            "has_human_review_disclaimer": true,
+            "gemini_output_required_repair": true,
+            "original_validation": {
+              "ok": false,
+              "citations": [],
+              "invalid_citations": [],
+              "forbidden_matches": [],
+              "has_human_review_disclaimer": false
+            }
+          }
+        },
+        {
+          "pass": true,
+          "message": "Artifact id returned.",
+          "details": "artifact_demo_denial_001_1780503028068_824632e3"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "true_appeal_fixture_is_not_auto_corrected",
+      "description": "Appeal-ish fixture stays out of golden bucket.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "True appeal fixture is not auto-corrected.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "True appeal fixture remains review-gated.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "credentialingish_fixture_has_no_extra_agent_scope",
+      "description": "Credentialing-ish fixture falls back without invoking out-of-scope agent.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "Credentialing-ish fixture does not become corrected_claim.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "Credentialing-ish fixture uses in-scope fallback bucket.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        }
+      ],
+      "failures": []
+    },
+    {
+      "id": "no_playbook_chunks_safe_fallback",
+      "description": "No retrieved playbooks produce low-confidence fallback.",
+      "ok": true,
+      "assertions": [
+        {
+          "pass": true,
+          "message": "No chunks do not auto-correct.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "No chunks stay low confidence.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        },
+        {
+          "pass": true,
+          "message": "No chunks record fallback reason.",
+          "details": {
+            "bucket": "payer_followup",
+            "bucket_confidence": 0.45,
+            "human_review_required": true,
+            "fallback_reason": "weak_or_ambiguous_policy_context"
+          }
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "report_path": "/Users/sanketdongre/Documents/Projects/ClaimCompass/docs/eval-reports/system-14-expanded-eval.json"
+}

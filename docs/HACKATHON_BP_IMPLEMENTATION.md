@@ -54,9 +54,9 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 9 | Atlas Vector Search | DONE | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
 | 10 | PolicyAgent | DONE | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
 | 11 | RootAgent orchestration and classification | DONE | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
-| 12 | Minimal eval gate | TODO | Agents CLI eval verifies golden-path retrieval/classification before drafting/UI work. |
-| 13 | DrafterAgent and citation validation | TODO | Generates corrected-claim guidance with valid playbook citations and inserts artifact. |
-| 14 | Expanded eval suite | TODO | Agents CLI eval covers drafting, citations, fallbacks, and edge cases. |
+| 12 | Minimal eval gate | DONE | Agents CLI eval works and ClaimCompass minimal eval verifies golden-path retrieval/classification plus safe fallbacks. |
+| 13 | DrafterAgent and citation validation | DONE | Generates corrected-claim guidance, validates playbook citations, and inserts the artifact through MongoDB MCP. |
+| 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
 | 15 | Landing page to demo route | TODO | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | TODO | Upload/paste, trace panel, result view, citations, before/after diff, save-as-rule. |
 | 17 | Deployment integration | TODO | ADK backend deployed to Agent Runtime or fallback Cloud Run; frontend deployed to Cloud Run. |
@@ -79,8 +79,8 @@ Internal target: **June 10, 2026 at 12:00 PM Europe/London**, leaving a 34-hour 
 | May 30-31 | Systems 8-9 | Playbook chunks embedded; `playbook_vec` index query returns sane results. |
 | June 1 | System 10 | PolicyAgent retrieval works through MCP. |
 | June 2 | System 11 | RootAgent classifies golden denial and writes trace events. |
-| June 3 | System 12 | Minimal eval gate passes before drafting/UI expansion. |
-| June 4 | Systems 13-14 | DrafterAgent artifact, citation validation, and expanded evals pass. |
+| June 3 | Systems 12-14 | Minimal eval, DrafterAgent artifact, citation validation, and expanded evals pass. |
+| June 4 | System 15 start / buffer | Begin landing-to-demo flow, or use as recovery buffer if eval drift appears. |
 | June 5-6 | Systems 15-16 | Landing-to-demo flow and agent demonstration UI work locally. |
 | June 7 | System 17 | Hosted backend and frontend integration works. |
 | June 8 | System 18 | Full hosted dress rehearsal and backup recording complete. |
@@ -765,7 +765,7 @@ Resources:
 
 ## System 12: Minimal Eval Gate
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: catch retrieval/classification failures before building the DrafterAgent and frontend on top of unstable behavior.
 
@@ -782,9 +782,22 @@ Do not:
 
 Acceptance checks:
 
-- `agents-cli eval run` works on the minimal set.
-- Golden path passes before System 13 starts.
-- Any failed trajectory becomes a fix in RootAgent/PolicyAgent before drafting work continues.
+- DONE: `agents-cli eval run --evalset tests/eval/evalsets/basic.evalset.json --config tests/eval/eval_config.json` passed against the ADK scaffold with 2 passed / 0 failed.
+- DONE: `npm run eval:minimal` passed the real ClaimCompass RootAgent/MongoDB/Gemini path.
+- DONE: golden denial retrieves telehealth modifier chunks and classifies as `corrected_claim` with confidence `0.92`.
+- DONE: weak/no retrieved playbook context falls back to low-confidence `payer_followup`.
+- DONE: ambiguous denial-code evidence stays human-review gated.
+
+Verification:
+
+```bash
+npm run eval:agents-cli
+npm run eval:minimal
+```
+
+Report:
+
+- `docs/eval-reports/system-12-minimal-eval.json`
 
 Resources:
 
@@ -793,7 +806,7 @@ Resources:
 
 ## System 13: DrafterAgent and Citation Validation
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: generate useful corrected-claim guidance grounded in retrieved MongoDB chunks.
 
@@ -816,10 +829,18 @@ Output:
 
 Acceptance checks:
 
-- Every citation resolves to a chunk returned by PolicyAgent.
-- No invented payer address or policy facts.
-- Artifact is stored in MongoDB.
-- Content includes human-review disclaimer.
+- DONE: `npm run draft:smoke` generates and stores a `corrected_claim_guidance` artifact in `generated_artifacts`.
+- DONE: citations resolve to returned `payer_playbooks._id` values.
+- DONE: validator rejects invented payer address/deadline/medical-necessity facts.
+- DONE: content includes the human-review disclaimer.
+- DONE: denial write-back sets `generated_artifact_id` and `status: "artifact_generated"` through MongoDB MCP `update-many`.
+- NOTE: Gemini's first free-form output omitted required citations during the June 3 smoke; the DrafterAgent validator repaired the draft into a citation-safe constrained artifact before storage. This is intentional guardrail behavior for the demo.
+
+Verification:
+
+```bash
+npm run draft:smoke
+```
 
 Resources:
 
@@ -828,7 +849,7 @@ Resources:
 
 ## System 14: Expanded Eval Suite
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: make quality repeatable after drafting is added, instead of relying on one successful demo run.
 
@@ -846,10 +867,18 @@ Do not:
 
 Acceptance checks:
 
-- `agents-cli eval run` works.
-- Eval report is saved or summarized.
-- Golden path passes before UI polish.
-- Citation validation failures are represented in eval or smoke-test fixtures.
+- DONE: `agents-cli eval run` works through `npm run eval:agents-cli`.
+- DONE: `npm run eval:expanded` passes the combined RootAgent -> DrafterAgent -> MongoDB artifact path.
+- DONE: expanded report is saved in `docs/eval-reports/system-14-expanded-eval.json`.
+- DONE: golden path passes before UI polish.
+- DONE: citation validation behavior is represented through the drafter validation summary.
+- DONE: true-appeal-ish, credentialing-ish, and no-playbook fixtures stay outside the golden corrected-claim automation path.
+
+Verification:
+
+```bash
+npm run eval:expanded
+```
 
 Resources:
 

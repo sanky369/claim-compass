@@ -13,6 +13,10 @@
     "playbooks:vector-smoke": "node scripts/playbooks/vector-smoke.mjs",
     "policy:smoke": "node scripts/policy/policy-smoke.mjs",
     "root:smoke": "node scripts/root/root-smoke.mjs",
+    "eval:agents-cli": "cd claimcompass-agent && agents-cli eval run --evalset tests/eval/evalsets/basic.evalset.json --config tests/eval/eval_config.json",
+    "eval:minimal": "node scripts/eval/minimal-eval.mjs",
+    "draft:smoke": "node scripts/drafter/drafter-smoke.mjs",
+    "eval:expanded": "node scripts/eval/expanded-eval.mjs",
     "mongodb:bootstrap": "node scripts/mongodb/bootstrap-foundation.mjs",
     "mongodb:mcp-smoke": "node scripts/mongodb/mcp-smoke.mjs",
     "mongodb:mcp-tools": "MDB_MCP_CONNECTION_STRING=${MONGODB_URI:-mongodb://localhost:27017/claimcompass} MDB_MCP_DRY_RUN=true MDB_MCP_TELEMETRY=disabled mongodb-mcp-server"
