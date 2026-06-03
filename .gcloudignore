@@ -1,0 +1,16 @@
+.git
+.github
+.next
+.vercel
+node_modules
+coverage
+*.log
+.env
+.env.*
+!.env.example
+claimcompass-agent/.venv
+claimcompass-agent/.pytest_cache
+claimcompass-agent/app/.adk
+docs/**/*.docx
+docs/test-documents/rendered
+docs/.DS_Store

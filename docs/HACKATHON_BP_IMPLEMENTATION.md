@@ -58,8 +58,8 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 13 | DrafterAgent and citation validation | DONE | Generates corrected-claim guidance, validates playbook citations, and inserts the artifact through MongoDB MCP. |
 | 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
 | 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
-| 16 | Next.js agent demonstration UI | TODO | Upload/paste, trace panel, result view, citations, before/after diff, save-as-rule. |
-| 17 | Deployment integration | TODO | ADK backend deployed to Agent Runtime or fallback Cloud Run; frontend deployed to Cloud Run. |
+| 16 | Next.js agent demonstration UI | DONE | Upload/paste start, trace panel, result view, citations, before/after diff, and save-as-rule work locally. |
+| 17 | Deployment integration | PARTIAL | Cloud Run deployment files and guarded deploy script exist; hosted deploy is pending explicit cost approval. |
 | 18 | Hosted dress rehearsal | TODO | Full timed hosted run succeeds, cold start measured, deterministic backup recording captured. |
 | 19 | README and submission assets | TODO | Judge-readable README, architecture image, demo script, screenshots, public repo/license. |
 | 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description. |
@@ -971,7 +971,7 @@ Resources:
 
 ## System 16: Next.js Agent Demonstration UI
 
-Status: `TODO`
+Status: `DONE`
 
 Purpose: make the agent legible to judges in under 60 seconds after the user enters the signed-in demo workspace.
 
@@ -1013,10 +1013,28 @@ Design constraints:
 
 Acceptance checks:
 
-- One click/paste starts the run.
-- Trace visibly shows Document AI, Gemini, and MCP tool calls.
-- Result explains the denial and next action.
-- Before/after diff proves MongoDB write-back.
+- DONE: `/demo/denials/new` has a one-click synthetic golden run action and paste fallback marker.
+- DONE: `POST /api/demo/run` starts the existing RootAgent -> DrafterAgent path and stores a `demo_runs` before/after snapshot.
+- DONE: `/demo/denials/demo_denial_001` shows workflow metrics, agent trace, corrected-claim result, citation chips, generated artifact, MongoDB before/after diff, and save-as-rule.
+- DONE: `POST /api/demo/rules` inserts a synthetic `billing_rules` document and trace event.
+- DONE: Trace view visibly includes Document AI extraction context, Gemini/MongoDB MCP retrieval/classification, DrafterAgent generation, and MongoDB write-back.
+- DONE: Client code does not receive Atlas URI or Google secrets; server-only route handlers perform secret-backed work.
+
+Verification:
+
+```bash
+npm run lint
+npm run build
+POST http://localhost:3000/api/demo/run
+POST http://localhost:3000/api/demo/rules
+GET  http://localhost:3000/demo/denials/demo_denial_001
+```
+
+Latest local proof:
+
+- `POST /api/demo/run` returned `200`, generated `run_1780507842760_ba8eaa13`, and redirected to `/demo/denials/demo_denial_001?run=run_1780507842760_ba8eaa13`.
+- Result page contained agent trace, MongoDB diff, save-as-rule UI, demo-data marker, and playbook citation `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`.
+- `POST /api/demo/rules` returned `200` and created `rule_1780507856518_71df3334`.
 
 Resources:
 
@@ -1025,7 +1043,7 @@ Resources:
 
 ## System 17: Deployment Integration
 
-Status: `TODO`
+Status: `PARTIAL`
 
 Purpose: produce stable hosted URLs for Devpost and demo recording.
 
@@ -1045,10 +1063,24 @@ Steps:
 
 Acceptance checks:
 
-- Hosted frontend URL works.
-- Agent endpoint works from frontend.
-- No secrets visible in client bundle or logs.
-- Cold start is acceptable for demo window.
+- DONE: Added `docs/DEPLOYMENT.md` with Cloud Run source deploy, Secret Manager, min-instance, and post-deploy verification notes.
+- DONE: Added `.gcloudignore` so local secrets, `.next`, `node_modules`, `.venv`, and bulky docs are excluded from Cloud Run source upload.
+- DONE: Added `scripts/deploy/cloud-run-frontend.sh`, guarded by `CONFIRM_CLOUD_RUN_DEPLOY=yes`.
+- DONE: Deploy helper defaults to `min-instances=0`, `max-instances=2`, and Secret Manager env vars.
+- DONE: Required secrets `mongodb-uri`, `documentai-processor-id`, and `documentai-location` exist in project `claimcompass-497412`.
+- DONE: Runtime dependencies needed by server route handlers and MCP scripts were moved to production dependencies.
+- BLOCKED: Actual hosted deploy is intentionally not run until explicit cost approval, because Cloud Run, Cloud Build, Artifact Registry, Gemini, Document AI, and egress can create billable usage.
+
+Prepared command:
+
+```bash
+CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
+```
+
+Notes:
+
+- The hosted System 16 path relies on the already-extracted synthetic denial. `scripts/document-ai/process-golden-eob.mjs` still shells out to `gcloud`; do not rely on hosted Document AI re-processing until that script is refactored to use metadata-server credentials or first-party Google client libraries.
+- Keep `min-instances=0` until final recording QA. Set `min-instances=1` only briefly if cold start is too slow, then scale back.
 
 Resources:
 

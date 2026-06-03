@@ -71,7 +71,8 @@ The submission wording is:
 
 Completed systems are tracked in
 [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
-As of the current baseline commit, Systems 0-14 are complete:
+As of the current baseline commit, Systems 0-16 are complete, and System 17 is
+deployment-ready but cost-gated:
 
 - Project guardrails and docs
 - Google Cloud project and cost controls
@@ -88,12 +89,15 @@ As of the current baseline commit, Systems 0-14 are complete:
 - Minimal eval gate over ADK CLI plus ClaimCompass RootAgent behavior
 - DrafterAgent artifact generation with citation validation
 - Expanded eval suite covering drafting, citations, and safe fallbacks
+- Landing page to demo gate handoff
+- Local Next.js demonstration UI with run API, trace, result, citations,
+  MongoDB before/after diff, and save-as-rule
 
 Next systems:
 
-- System 15: landing page to demo route
-- System 16: Next.js agent demonstration UI
-- System 17: deployment integration
+- System 17: deploy to Cloud Run after explicit cost approval
+- System 18: hosted dress rehearsal
+- System 19: README/submission assets
 
 ## Local Setup
 
@@ -188,6 +192,23 @@ npm run eval:agents-cli
 npm run eval:minimal
 npm run draft:smoke
 npm run eval:expanded
+```
+
+Run the local demo UI proof:
+
+```bash
+npm run dev
+```
+
+Then open `/demo/denials/new`, click **Run golden demo**, and inspect
+`/demo/denials/demo_denial_001`.
+
+Deployment notes live in
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). The deploy helper is guarded and
+will not run without explicit cost approval:
+
+```bash
+CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
 ```
 
 The smoke query uses an MCP `aggregate` call with this `$vectorSearch` shape:

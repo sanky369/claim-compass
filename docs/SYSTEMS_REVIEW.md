@@ -27,6 +27,8 @@ remains.
 | 13 | DONE | `npm run draft:smoke` generated and stored a validated `corrected_claim_guidance` artifact. | Gemini may omit required citations; the validator repairs or rejects before storage. |
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
+| 16 | DONE | `POST /api/demo/run` returned `200`; result page shows trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. `npm run lint` and `npm run build` pass. | Uses the synthetic golden denial only; hosted Document AI re-processing is not refactored yet. |
+| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified. | Actual Cloud Run deploy is pending explicit cost approval. |
 
 ## Latest Verification Commands
 
@@ -35,12 +37,12 @@ npm run eval:agents-cli
 npm run eval:minimal
 npm run draft:smoke
 npm run eval:expanded
+npm run lint
+npm run build
 ```
 
 ## Current Next Build
 
-System 16 builds the actual agent demonstration UI on top of the System 15
-handoff: the real upload/paste flow at `/demo/denials/new`, the live agent
-trace panel, the result/citation view, and the MongoDB before/after diff. The
-frontend should still stay a narrow, deterministic demo workspace rather than a
-broad production app.
+System 17 needs a cost-approved Cloud Run deploy, followed by System 18 hosted
+dress rehearsal. Keep `min-instances=0` until final recording QA unless cold
+start is unacceptable.

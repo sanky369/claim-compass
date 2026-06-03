@@ -22,21 +22,21 @@
     "mongodb:mcp-tools": "MDB_MCP_CONNECTION_STRING=${MONGODB_URI:-mongodb://localhost:27017/claimcompass} MDB_MCP_DRY_RUN=true MDB_MCP_TELEMETRY=disabled mongodb-mcp-server"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@google/genai": "^2.7.0",
+    "mongodb": "^7.2.0",
+    "mongodb-mcp-server": "^1.11.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
-    "mongodb": "^7.2.0",
-    "mongodb-mcp-server": "^1.11.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
