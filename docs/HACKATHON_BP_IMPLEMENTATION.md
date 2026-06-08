@@ -59,7 +59,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
 | 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | DONE | Upload/paste start, trace panel, result view, citations, before/after diff, and save-as-rule work locally. |
-| 17 | Deployment integration and runtime honesty | PARTIAL | Cloud Run deployment files exist; hosted deploy, Cloud Run IAM, Atlas connectivity, and final ADK/Agent Runtime claim need proof before submission. |
+| 17 | Deployment integration and runtime honesty | PARTIAL | Cloud Run deployment files exist and ADK runtime wording is honest; hosted deploy, Cloud Run IAM, and Atlas connectivity still need proof after cost approval. |
 | 18 | Hosted dress rehearsal and UI polish | TODO | Full timed hosted sample-PDF run succeeds twice, cold start measured, confusing fallback UI removed or renamed, deterministic backup recording captured. |
 | 19 | README and submission assets | TODO | Judge-readable README, architecture image, screenshots, Devpost copy, repo/license, and honest runtime wording are complete. |
 | 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description, and synthetic-data safety message submitted. |
@@ -1013,7 +1013,7 @@ Design constraints:
 
 Acceptance checks:
 
-- DONE: `/demo/denials/new` has a visible sample PDF import card, "Open sample PDF" link, one-click Document AI import/run action, seeded-extraction fallback, and paste fallback marker.
+- DONE: `/demo/denials/new` has a visible sample PDF import card, "Open sample PDF" link, one-click Document AI import/run action, and a seeded-extraction fallback. The confusing paste fallback marker was removed before final testing.
 - DONE: `GET /api/demo/sample-pdf` serves the exact synthetic PDF being uploaded: `golden-bcbs-tx-90837-missing-modifier-eob.pdf`.
 - DONE: `POST /api/demo/run` with `mode: "sample_pdf"` uploads the sample PDF to GCS, processes it with Document AI, then starts the existing RootAgent -> DrafterAgent path and stores a `demo_runs` before/after snapshot.
 - DONE: `/demo/denials/demo_denial_001` shows workflow metrics, agent trace, corrected-claim result, citation chips, generated artifact, MongoDB before/after diff, and save-as-rule.
@@ -1053,7 +1053,7 @@ sure the final stack claim is true.
 
 Target shape:
 
-- ADK backend: Agent Runtime / Vertex AI Agent Engine.
+- ADK backend: ClaimCompass-specific ADK app targeting Agent Runtime / Vertex AI Agent Engine.
 - Frontend: Cloud Run.
 - Optional fallback: backend tool/API shim on Cloud Run if Agent Runtime integration blocks.
 
@@ -1086,6 +1086,9 @@ Acceptance checks:
 - DONE: Deploy helper defaults to `min-instances=0`, `max-instances=2`, and Secret Manager env vars.
 - DONE: Required secrets `mongodb-uri`, `documentai-processor-id`, `documentai-location`, and `gcs-upload-bucket` exist in project `claimcompass-497412`.
 - DONE: Runtime dependencies needed by server route handlers and MCP scripts were moved to production dependencies.
+- DONE: Replaced the default weather/time ADK scaffold with a ClaimCompass-specific synthetic-denial agent in `claimcompass-agent/app/agent.py`.
+- DONE: Updated ADK eval fixtures from scaffold weather prompts to ClaimCompass golden-denial prompts.
+- DONE: README and `.agents-cli-spec.md` now use honest wording: Agent Runtime is the managed target/proof path, while the hosted demo runs on Cloud Run unless a final Agent Runtime deploy is explicitly approved and tested.
 - BLOCKED: Actual hosted deploy is intentionally not run until explicit cost approval, because Cloud Run, Cloud Build, Artifact Registry, Gemini, Document AI, and egress can create billable usage.
 - TODO: Hosted `/api/health` returns `ok` on Cloud Run.
 - TODO: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
@@ -1095,10 +1098,11 @@ Acceptance checks:
 - TODO: Atlas connectivity choice is written in `docs/DEPLOYMENT.md`, including
   cost/security tradeoff and cleanup step if a broad temporary allowlist is
   used.
-- TODO: ADK/Agent Runtime claim is either made true with a real ClaimCompass ADK
-  path, or softened everywhere before Devpost submission.
-- TODO: No final README, Devpost copy, or video script presents the placeholder
-  ADK weather/time scaffold as the production ClaimCompass agent.
+- DONE: ADK/Agent Runtime claim is softened everywhere under our control before Devpost submission.
+- DONE: No final README or repo demo copy presents the placeholder ADK weather/time scaffold as the production ClaimCompass agent.
+- DONE: `npm run eval:agents-cli` passes against the ClaimCompass-specific ADK eval set with 2 passed / 0 failed.
+- BLOCKED: MongoDB-backed local smokes currently fail from this machine because Atlas rejects the current network path. Atlas CLI auth is expired, so updating the network allowlist needs `atlas auth login` before retrying `CLAIMCOMPASS_USE_SECRET_MANAGER=yes npm run eval:minimal`.
+- TODO: If final Agent Runtime deploy is approved, update README/Devpost/video wording from "designed for Agent Runtime" to "deployed on Agent Runtime" only after a hosted Agent Runtime query succeeds.
 
 Prepared command:
 
@@ -1148,6 +1152,7 @@ Measurements:
 
 Acceptance checks:
 
+- Local UI polish removes the confusing paste-fallback marker before hosted rehearsal.
 - Full hosted run succeeds twice in a row.
 - Hosted sample-PDF flow shows the exact PDF filename, local sample path, and
   GCS URI so judges understand what was processed.

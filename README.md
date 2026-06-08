@@ -34,7 +34,7 @@ agent loop:
 |---|---|
 | Frontend | Next.js App Router |
 | Agent framework | Google ADK / Agents CLI |
-| Agent runtime | Google Cloud Agent Runtime / Vertex AI Agent Engine |
+| Agent runtime target | Google Cloud Agent Runtime / Vertex AI Agent Engine |
 | Models | Gemini generation and `gemini-embedding-001` embeddings |
 | OCR | Google Document AI Form Parser |
 | Database | MongoDB Atlas |
@@ -43,11 +43,11 @@ agent loop:
 | Secrets | Google Secret Manager for deployed config, ignored `.env.local` locally |
 | Hosting target | Cloud Run for the demo app |
 
-The submission wording is:
+The final submission wording should stay honest to the proven deployment path:
 
-> Built with Gemini and Google Cloud Agent Builder using ADK, deployed on Agent
-> Runtime / Vertex AI Agent Engine, and integrated with MongoDB Atlas through
-> the official MongoDB MCP Server.
+> Built with Gemini and Google Cloud Agent Builder using ADK, designed for Agent
+> Runtime / Vertex AI Agent Engine, hosted for the demo on Cloud Run, and
+> integrated with MongoDB Atlas through the official MongoDB MCP Server.
 
 ## Repository Map
 
@@ -55,7 +55,7 @@ The submission wording is:
 .
 ├── app/                         # Next.js app shell
 ├── components/                  # Landing/demo UI components
-├── claimcompass-agent/          # ADK / Agents CLI backend scaffold
+├── claimcompass-agent/          # ClaimCompass-specific ADK / Agents CLI app
 ├── docs/
 │   ├── HACKATHON_BLUEPRINT.md   # Product, architecture, and judging strategy
 │   ├── HACKATHON_BP_IMPLEMENTATION.md
@@ -71,16 +71,15 @@ The submission wording is:
 
 Completed systems are tracked in
 [`docs/HACKATHON_BP_IMPLEMENTATION.md`](docs/HACKATHON_BP_IMPLEMENTATION.md).
-As of the current baseline commit, Systems 0-16 are complete, and System 17 is
-deployment-ready but cost-gated. System 17 also now carries the final runtime
-honesty gate: before submission, the project must either prove a real
-ClaimCompass ADK/Agent Runtime path or describe the hosted demo as Cloud Run API
-infrastructure backed by Google AI services, without overclaiming the scaffold.
+As of the current baseline commit, Systems 0-17 are final-testing ready except
+for the cost-approved hosted Cloud Run deploy and hosted dress rehearsal.
+The old ADK weather/time scaffold has been replaced by a ClaimCompass-specific
+synthetic-denial agent, so the repo no longer overclaims a placeholder agent.
 
 - Project guardrails and docs
 - Google Cloud project and cost controls
 - Agent implementation spec
-- ADK scaffold and hello Agent Runtime proof
+- ClaimCompass-specific ADK app and hello Agent Runtime proof
 - MongoDB Atlas foundation
 - MongoDB MCP smoke path
 - Synthetic demo data
@@ -98,9 +97,9 @@ infrastructure backed by Google AI services, without overclaiming the scaffold.
 
 Next systems:
 
-- System 17: deploy to Cloud Run after explicit cost approval, verify hosted
-  sample-PDF processing, Cloud Run IAM, Atlas connectivity, and runtime wording
-- System 18: hosted dress rehearsal and UI polish
+- System 17: deploy to Cloud Run after explicit cost approval, then verify
+  hosted sample-PDF processing, Cloud Run IAM, and Atlas connectivity
+- System 18: hosted dress rehearsal and backup recording
 - System 19: README/submission assets with honest stack claims
 
 ## Local Setup

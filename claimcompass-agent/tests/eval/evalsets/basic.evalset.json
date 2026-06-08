@@ -1,14 +1,18 @@
 {
   "eval_set_id": "basic_eval",
-  "name": "Basic Agent Evaluation",
-  "description": "Sample evaluation set for testing core agent functionality. Customize these cases for your agent.",
+  "name": "ClaimCompass Basic Evaluation",
+  "description": "Basic eval set for the synthetic ClaimCompass golden-path ADK agent.",
   "eval_cases": [
     {
-      "eval_id": "greeting",
+      "eval_id": "claimcompass_capabilities",
       "conversation": [
         {
           "user_content": {
-            "parts": [{"text": "Hello, what can you help me with?"}]
+            "parts": [
+              {
+                "text": "What can ClaimCompass help me with in this demo?"
+              }
+            ]
           }
         }
       ],
@@ -19,11 +23,15 @@
       }
     },
     {
-      "eval_id": "weather_query",
+      "eval_id": "golden_denial_next_action",
       "conversation": [
         {
           "user_content": {
-            "parts": [{"text": "What's the weather like in San Francisco?"}]
+            "parts": [
+              {
+                "text": "For demo_denial_001, why was CPT 90837 denied and what should I do next?"
+              }
+            ]
           }
         }
       ],

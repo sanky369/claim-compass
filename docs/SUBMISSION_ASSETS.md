@@ -1,0 +1,101 @@
+# ClaimCompass Submission Assets
+
+Last updated: 2026-06-08
+
+## Short Pitch
+
+ClaimCompass is a Gemini-powered denial-resolution agent for independent
+healthcare providers. In the hackathon demo, it reads one synthetic denied
+therapy claim, extracts fields with Google Document AI, retrieves payer-specific
+rules from MongoDB Atlas Vector Search through the official MongoDB MCP Server,
+classifies the next-best action, drafts corrected-claim guidance with citations,
+and writes the result back to MongoDB.
+
+## Devpost Description Draft
+
+Independent therapists lose hours and revenue when an insurance denial says
+something vague like `CO-45` or `N179`. The hard part is not writing an appeal;
+it is knowing whether to resubmit, correct the claim, call the payer, appeal, or
+bill the client.
+
+ClaimCompass turns that messy denial workflow into a traceable agent run. For
+the hackathon, the demo focuses on one synthetic golden path: BCBS Texas Demo,
+CPT `90837`, missing telehealth modifier `95`, denial codes `CO-45` and `N179`.
+The user opens the synthetic PDF, starts the run, and watches ClaimCompass:
+
+- upload the sample PDF to Cloud Storage;
+- extract denial fields with Google Document AI;
+- retrieve synthetic payer playbook guidance from MongoDB Atlas Vector Search;
+- use MongoDB MCP for agent reads, vector retrieval, trace inserts, artifact
+  inserts, and save-as-rule write-back;
+- use Gemini to classify the denial and draft corrected-claim guidance;
+- show citations, trace events, and a before/after MongoDB diff in the demo UI.
+
+This is intentionally not a generic chatbot. The visible proof is the loop:
+document in, tool trace, grounded retrieval, next-best-action classification,
+artifact generation, and MongoDB write-back.
+
+All demo documents are synthetic and marked `DEMO DATA - NOT REAL PHI`.
+ClaimCompass is decision support for human billing review, not legal, clinical,
+billing, or payer-policy advice.
+
+## Stack Wording
+
+Use this wording unless a final ClaimCompass-specific Agent Runtime deployment
+is actually approved, deployed, and tested:
+
+> Built with Gemini and Google Cloud Agent Builder using ADK, designed for Agent
+> Runtime / Vertex AI Agent Engine, hosted for the demo on Cloud Run, and
+> integrated with MongoDB Atlas through the official MongoDB MCP Server.
+
+If a final Agent Runtime deployment succeeds, this may be changed to:
+
+> Built with Gemini and Google Cloud Agent Builder using ADK, deployed on Agent
+> Runtime / Vertex AI Agent Engine, hosted with a Cloud Run demo UI, and
+> integrated with MongoDB Atlas through the official MongoDB MCP Server.
+
+## MongoDB Track Proof Points
+
+- Atlas database: `claimcompass`
+- Collections used in the demo: `denials`, `payer_playbooks`,
+  `generated_artifacts`, `billing_rules`, `trace_events`, `carc`, `rarc`
+- Vector index: `playbook_vec`
+- Retrieval proof: MongoDB MCP `aggregate` with `$vectorSearch` as the first
+  pipeline stage
+- Write-back proof: inserted trace events, generated artifact, demo run record,
+  and save-as-rule document
+- Safety proof: synthetic data only, no PHI, no real payer documents
+
+## Screenshot List
+
+Capture these after the hosted dress rehearsal:
+
+1. Landing page or sign-in demo gate.
+2. Sample PDF import card showing the PDF filename.
+3. Trace panel showing Document AI, Gemini, MongoDB MCP, and `$vectorSearch`.
+4. Result page with corrected-claim guidance and citation chip.
+5. MongoDB before/after diff.
+6. Save-as-rule success state.
+
+## Video Voiceover Skeleton
+
+> ClaimCompass is a denial-resolution agent for independent providers. The demo
+> uses only synthetic data, no real PHI.
+>
+> Here is the denied claim: CPT 90837, BCBS Texas Demo, denied with CO-45 and
+> N179 because the telehealth modifier is missing.
+>
+> When I start the run, ClaimCompass uploads the sample PDF to Cloud Storage,
+> processes it with Google Document AI, retrieves payer guidance from MongoDB
+> Atlas Vector Search through the official MongoDB MCP Server, and uses Gemini
+> to classify the next-best action.
+>
+> The important part is the trace. This is not a chatbot answer; the app shows
+> the tool path, the retrieved playbook citation, the decision bucket, and the
+> before/after MongoDB state.
+>
+> ClaimCompass recommends a corrected claim, not a formal appeal, and generates
+> human-review guidance tied to the retrieved playbook.
+>
+> Finally, the save-as-rule action writes a reusable billing rule back to
+> MongoDB so the same denial pattern is easier to prevent next time.

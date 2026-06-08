@@ -9,11 +9,11 @@
       "rubrics": [
         {
           "rubricId": "relevance",
-          "rubricContent": { "textProperty": "The response directly addresses the user's query." }
+          "rubricContent": { "textProperty": "The response directly addresses the ClaimCompass synthetic denial demo question." }
         },
         {
           "rubricId": "helpfulness",
-          "rubricContent": { "textProperty": "The response is helpful and provides useful information." }
+          "rubricContent": { "textProperty": "The response is useful decision support, mentions synthetic demo data, and avoids real PHI or final billing advice." }
         }
       ]
     }

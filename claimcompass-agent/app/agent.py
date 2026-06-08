@@ -1,4 +1,3 @@
-# ruff: noqa
 # Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,65 +11,112 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""ClaimCompass ADK entrypoint for the hackathon demo.
 
-import datetime
-from zoneinfo import ZoneInfo
+The production demo is intentionally narrow: one synthetic golden-path denial
+for BCBS-TX, CPT 90837, missing telehealth modifier 95, CARC CO-45 and RARC
+N179. The Next.js demo API still runs the full Document AI -> MongoDB MCP ->
+Gemini -> write-back flow for the live UI. This ADK app gives Agent Runtime a
+ClaimCompass-specific agent, not the default weather/time scaffold.
+"""
+
+from __future__ import annotations
+
+import os
+from typing import Any
 
 from google.adk.agents import Agent
 from google.adk.apps import App
 from google.adk.models import Gemini
 from google.genai import types
 
-import os
-import google.auth
+GOLDEN_DENIAL_ID = "demo_denial_001"
 
-_, project_id = google.auth.default()
-os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
-os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
-os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "claimcompass-497412")
+os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
 
 
-def get_weather(query: str) -> str:
-    """Simulates a web search. Use it get information on weather.
+def decode_claimcompass_golden_denial(denial_id: str = GOLDEN_DENIAL_ID) -> dict[str, Any]:
+    """Return the deterministic ClaimCompass plan for the synthetic demo denial.
 
     Args:
-        query: A string containing the location to get weather information for.
+        denial_id: Synthetic demo denial id. Only ``demo_denial_001`` is
+            supported for the hackathon safety boundary.
 
     Returns:
-        A string with the simulated weather information for the queried location.
+        A structured decision-support summary for the golden denial.
     """
-    if "sf" in query.lower() or "san francisco" in query.lower():
-        return "It's 60 degrees and foggy."
-    return "It's 90 degrees and sunny."
+    if denial_id != GOLDEN_DENIAL_ID:
+        return {
+            "ok": False,
+            "demo_data_notice": "DEMO DATA - NOT REAL PHI",
+            "error": (
+                "ClaimCompass hackathon ADK demo only supports the synthetic "
+                "golden denial demo_denial_001. Do not provide real PHI."
+            ),
+        }
 
-
-def get_current_time(query: str) -> str:
-    """Simulates getting the current time for a city.
-
-    Args:
-        city: The name of the city to get the current time for.
-
-    Returns:
-        A string with the current time information.
-    """
-    if "sf" in query.lower() or "san francisco" in query.lower():
-        tz_identifier = "America/Los_Angeles"
-    else:
-        return f"Sorry, I don't have timezone information for query: {query}."
-
-    tz = ZoneInfo(tz_identifier)
-    now = datetime.datetime.now(tz)
-    return f"The current time for query {query} is {now.strftime('%Y-%m-%d %H:%M:%S %Z%z')}"
+    return {
+        "ok": True,
+        "demo_data_notice": "DEMO DATA - NOT REAL PHI",
+        "denial_id": GOLDEN_DENIAL_ID,
+        "payer": "BCBS Texas Demo",
+        "claim": {
+            "cpt": "90837",
+            "issue": "Missing telehealth modifier 95",
+            "codes": ["CO-45", "N179"],
+        },
+        "decision": {
+            "bucket": "corrected_claim",
+            "next_best_action": (
+                "Submit a corrected claim with modifier 95 on CPT 90837 after "
+                "human billing review confirms the original place of service "
+                "and telehealth documentation."
+            ),
+            "why": (
+                "The retrieved synthetic BCBS-TX playbook says this denial "
+                "pattern is usually a claim-correction workflow, not a formal "
+                "appeal, when the telehealth modifier is missing."
+            ),
+        },
+        "google_cloud_runtime": [
+            "Google Document AI extracts the synthetic EOB in the hosted UI flow.",
+            "Gemini embedding-001 creates 1536-dimensional playbook vectors.",
+            "Gemini generation drafts human-review billing guidance.",
+            "ADK/Agent Runtime hosts this ClaimCompass-specific agent surface.",
+        ],
+        "mongodb_proof": [
+            "MongoDB MCP aggregate uses $vectorSearch on payer_playbooks.",
+            "MongoDB MCP inserts trace events and generated artifacts.",
+            "MongoDB MCP write-back records the save-as-rule demo action.",
+        ],
+        "citation_id": "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+        "human_review_notice": (
+            "Decision support only. A human biller must verify payer policy, "
+            "documentation, and claim facts before submission."
+        ),
+    }
 
 
 root_agent = Agent(
-    name="root_agent",
+    name="claimcompass_agent",
     model=Gemini(
         model="gemini-flash-latest",
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
-    instruction="You are a helpful AI assistant designed to provide accurate and useful information.",
-    tools=[get_weather, get_current_time],
+    instruction=(
+        "You are ClaimCompass, a synthetic-demo denial resolution copilot for "
+        "independent healthcare providers. Stay inside the hackathon golden "
+        "path: BCBS-TX Demo, CPT 90837, missing telehealth modifier 95, CO-45 "
+        "and N179. Always mention that the data is synthetic demo data and not "
+        "real PHI. Use the decode_claimcompass_golden_denial tool when asked "
+        "what ClaimCompass does, why the denial happened, what action to take, "
+        "or how the Google Cloud and MongoDB stack is proven. Do not provide "
+        "legal, clinical, billing, or payer-policy advice beyond decision "
+        "support for human review."
+    ),
+    tools=[decode_claimcompass_golden_denial],
 )
 
 app = App(

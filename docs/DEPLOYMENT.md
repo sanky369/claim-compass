@@ -85,12 +85,36 @@ Manual browser flow:
    - MongoDB before/after diff
    - Save-as-rule button
 
+## Cloud Run to Atlas Connectivity
+
+Cloud Run services do not have a stable outbound IP by default. Atlas network
+access must be handled before the hosted sample-PDF run can pass.
+
+Fast hackathon option:
+
+- Temporarily allow `0.0.0.0/0` in Atlas Network Access for the `ClaimCompass`
+  project only during final hosted testing/recording.
+- Keep the Atlas app user least-privilege: `readWrite@claimcompass`, not Atlas
+  admin.
+- Remove the broad allowlist entry immediately after submission.
+
+More production-like option:
+
+- Use Serverless VPC Access plus Cloud NAT/static egress, then allowlist only
+  that static egress IP in Atlas.
+- This is safer, but it adds setup time and potential network/NAT cost. Do not
+  add it during the hackathon unless explicitly approved.
+
+For final testing, record which option was used in the submission checklist and
+clean up any temporary broad allowlist entry after the video is captured.
+
 ## Cost Notes
 
 - Keep Cloud Run `min-instances=0` until the final recording window.
 - Do not enable dedicated Atlas Search Nodes.
 - Do not upgrade Atlas from M0.
 - Do not paste real PHI or real payer documents into the hosted demo.
+- Remove any temporary broad Atlas network allowlist entry after submission.
 
 ## Official References
 

@@ -32,19 +32,27 @@ load_dotenv()
 class AgentEngineApp(AdkApp):
     def set_up(self) -> None:
         """Initialize the agent engine app with logging and telemetry."""
-        vertexai.init()
-        setup_telemetry()
+        is_integration_test = os.environ.get("INTEGRATION_TEST") == "TRUE"
+        if not is_integration_test:
+            vertexai.init()
+            setup_telemetry()
         super().set_up()
         logging.basicConfig(level=logging.INFO)
-        logging_client = google_cloud_logging.Client()
-        self.logger = logging_client.logger(__name__)
+        if is_integration_test:
+            self.logger = logging.getLogger(__name__)
+        else:
+            logging_client = google_cloud_logging.Client()
+            self.logger = logging_client.logger(__name__)
         if gemini_location:
             os.environ["GOOGLE_CLOUD_LOCATION"] = gemini_location
 
     def register_feedback(self, feedback: dict[str, Any]) -> None:
         """Collect and log feedback."""
         feedback_obj = Feedback.model_validate(feedback)
-        self.logger.log_struct(feedback_obj.model_dump(), severity="INFO")
+        if hasattr(self.logger, "log_struct"):
+            self.logger.log_struct(feedback_obj.model_dump(), severity="INFO")
+        else:
+            self.logger.info("feedback=%s", feedback_obj.model_dump())
 
     def register_operations(self) -> dict[str, list[str]]:
         """Registers the operations of the Agent."""

@@ -1,7 +1,19 @@
-# claimcompass-agent
+# ClaimCompass ADK Agent
 
-Simple ReAct agent
-Agent generated with `agents-cli` version `0.2.0`
+ClaimCompass-specific ADK app generated with `agents-cli` version `0.2.0` and
+customized for the Google Cloud Rapid Agent Hackathon MongoDB track.
+
+The agent is intentionally scoped to the synthetic golden denial:
+
+- payer: BCBS Texas Demo
+- CPT: `90837`
+- issue: missing telehealth modifier `95`
+- denial codes: `CO-45` and `N179`
+- action bucket: `corrected_claim`
+
+The hosted Next.js demo API runs the full sample-PDF flow. This ADK package
+provides the ClaimCompass-specific Agent Runtime target and eval surface, not a
+generic weather/time scaffold.
 
 ## Project Structure
 
@@ -15,8 +27,6 @@ claimcompass-agent/
 ├── GEMINI.md                  # AI-assisted development guide
 └── pyproject.toml             # Project dependencies
 ```
-
-> 💡 **Tip:** Use [Gemini CLI](https://github.com/google-gemini/gemini-cli) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
 
 ## Requirements
 
@@ -71,17 +81,22 @@ You can also use features from the [ADK](https://adk.dev/) CLI with `uv run adk`
 
 ## Development
 
-Edit your agent logic in `app/agent.py` and test with `agents-cli playground` - it auto-reloads on save.
+Edit the agent logic in `app/agent.py` and test with `agents-cli playground` -
+it auto-reloads on save.
 
 ## Deployment
 
 ```bash
-gcloud config set project <your-project-id>
+gcloud config set project claimcompass-497412
 agents-cli deploy
 ```
 
 To add CI/CD and Terraform, run `agents-cli scaffold enhance`.
 To set up your production infrastructure, run `agents-cli infra cicd`.
+
+Do not deploy Agent Runtime without explicit cost approval. Earlier deploy tests
+used nonzero idle capacity, so temporary deployments should be deleted or scaled
+down after proof.
 
 ## Observability
 

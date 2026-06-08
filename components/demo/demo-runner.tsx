@@ -28,7 +28,6 @@ export function DemoRunner() {
   const router = useRouter();
   const [state, setState] = useState<RunState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [pasteText, setPasteText] = useState("");
   const [runningMode, setRunningMode] = useState<RunMode | null>(null);
   const activeSteps =
     runningMode === "seeded_extraction" ? seededRunningSteps : runningSteps;
@@ -60,7 +59,7 @@ export function DemoRunner() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-5">
         <section className="flex flex-col rounded-2xl border border-dashed border-stone-300 bg-white p-6">
           <div className="flex items-center gap-2 text-sm font-semibold text-stone-900">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-700">
@@ -108,26 +107,11 @@ export function DemoRunner() {
           >
             Run from seeded extraction
           </button>
-        </section>
-
-        <section className="flex flex-col rounded-2xl border border-stone-200 bg-white p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-stone-900">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-700">
-              2
-            </span>
-            Paste fallback marker
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-stone-600">
-            Optional for the demo script. Do not paste real PHI. System 16 keeps
-            the backend fixed to the synthetic golden claim for safety, but this
-            marker lets the presenter explain the fallback flow.
+          <p className="mt-3 text-xs leading-relaxed text-stone-500">
+            The seeded fallback reuses the known synthetic extraction if
+            Document AI or GCS is unavailable during recording. It does not
+            accept pasted text or real PHI.
           </p>
-          <textarea
-            value={pasteText}
-            onChange={(event) => setPasteText(event.target.value)}
-            placeholder="Synthetic paste fallback text only..."
-            className="mt-4 min-h-28 resize-none rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700 outline-none transition-colors placeholder:text-stone-400 focus:border-brand-300 focus:bg-white"
-          />
         </section>
       </div>
 

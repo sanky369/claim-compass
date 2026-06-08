@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
 export function loadLocalEnv() {
@@ -39,7 +40,10 @@ export function loadLocalEnv() {
 export function requireMongoEnv() {
   loadLocalEnv();
 
-  const uri = process.env.MONGODB_URI || process.env.MDB_MCP_CONNECTION_STRING;
+  const uri =
+    loadMongoUriFromSecretManager() ||
+    process.env.MONGODB_URI ||
+    process.env.MDB_MCP_CONNECTION_STRING;
   const database = process.env.MONGODB_DATABASE || "claimcompass";
 
   if (!uri) {
@@ -49,4 +53,40 @@ export function requireMongoEnv() {
   }
 
   return { uri, database };
+}
+
+function loadMongoUriFromSecretManager() {
+  if (process.env.CLAIMCOMPASS_USE_SECRET_MANAGER !== "yes") {
+    return null;
+  }
+
+  const project =
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    "claimcompass-497412";
+
+  try {
+    return execFileSync(
+      "gcloud",
+      [
+        "secrets",
+        "versions",
+        "access",
+        "latest",
+        "--secret",
+        "mongodb-uri",
+        "--project",
+        project,
+      ],
+      {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    ).trim();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown error";
+    throw new Error(
+      `Unable to read mongodb-uri from Secret Manager for project ${project}: ${message}`,
+    );
+  }
 }

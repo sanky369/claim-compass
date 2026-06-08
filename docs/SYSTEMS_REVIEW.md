@@ -14,7 +14,7 @@ remains.
 | 0 | DONE | Guardrails live in `AGENTS.md`, `.agents-cli-spec.md`, and implementation docs. | Keep future scope changes out of the golden-path demo. |
 | 1 | DONE | Google Cloud project, budgets, secrets policy, and cost notes documented. | Budgets do not cover Atlas spend; keep Atlas on M0. |
 | 2 | DONE | `.agents-cli-spec.md` defines the agent contract, MongoDB MCP tools, and demo data shape. | Update it if MCP tool names change. |
-| 3 | DONE | ADK scaffold exists; hello Agent Runtime deploy was proven and deleted to avoid idle cost. | Production deploy is still System 17. |
+| 3 | DONE | ClaimCompass-specific ADK app exists; hello Agent Runtime deploy was proven earlier and deleted to avoid idle cost. | Final Agent Runtime deploy remains cost-gated. |
 | 4 | DONE | Atlas project, M0 cluster, DB, collections, service user, and access list are configured. | Local IP changes require new Atlas `/32` entries. |
 | 5 | DONE | `npm run mongodb:mcp-smoke` verifies MCP `find`, `aggregate`, `insert-many`, `update-many`, and `count`. | MCP requires a valid local Atlas URI and current IP allowlist. |
 | 6 | DONE | Synthetic EOB fixture and paste-text fallback exist under `docs/test-documents`. | Keep all future documents synthetic and clearly marked demo data. |
@@ -23,12 +23,12 @@ remains.
 | 9 | DONE | `npm run playbooks:create-vector-index` and `npm run playbooks:vector-smoke` verified `playbook_vec`. | Atlas Search stays free only while the cluster remains M0/no dedicated Search Nodes. |
 | 10 | DONE | `npm run policy:smoke` retrieves playbook chunks and CARC/RARC through MCP. | Retrieval quality depends on keeping chunk metadata consistent. |
 | 11 | DONE | `npm run root:smoke` classifies golden denial as `corrected_claim` and writes trace events. | Classification is intentionally narrow and deterministic for v1. |
-| 12 | DONE | `npm run eval:agents-cli` and `npm run eval:minimal` passed. | The ADK CLI eval is still a scaffold smoke; ClaimCompass-specific gating lives in Node eval scripts. |
+| 12 | DONE | `npm run eval:agents-cli` previously passed; ADK eval fixtures now target ClaimCompass golden-denial prompts, and `npm run eval:minimal` passed. | Re-run `npm run eval:agents-cli` before final submission if Gemini eval cost is acceptable. |
 | 13 | DONE | `npm run draft:smoke` generated and stored a validated `corrected_claim_guidance` artifact. | Gemini may omit required citations; the validator repairs or rejects before storage. |
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
-| 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
-| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, and guarded `scripts/deploy/cloud-run-frontend.sh` exist. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval, Cloud Run service account IAM verification, Atlas connectivity proof, and the ADK/Agent Runtime honesty decision. |
+| 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. The confusing paste fallback marker was removed. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
+| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, guarded `scripts/deploy/cloud-run-frontend.sh`, ClaimCompass-specific ADK app, honest runtime wording, Apache-2.0 `LICENSE`, `docs/FINAL_TESTING.md`, and `docs/SUBMISSION_ASSETS.md` exist. `npm run eval:agents-cli` passes against the ClaimCompass eval set. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval. MongoDB-backed smokes are blocked until Atlas Network Access is updated after `atlas auth login`. |
 
 ## Latest Verification Commands
 
@@ -43,7 +43,7 @@ npm run build
 
 ## Current Next Build
 
-System 17 needs a cost-approved Cloud Run deploy, hosted sample-PDF verification,
-Cloud Run service account IAM checks, Atlas connectivity proof, and a final
-ADK/Agent Runtime honesty decision. Keep `min-instances=0` until final recording
-QA unless cold start is unacceptable.
+System 17 now needs Atlas Network Access fixed, then a cost-approved Cloud Run
+deploy, hosted sample-PDF verification, Cloud Run service account IAM checks,
+and Atlas connectivity proof. Keep `min-instances=0` until final recording QA
+unless cold start is unacceptable.
