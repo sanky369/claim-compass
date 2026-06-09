@@ -94,13 +94,18 @@ synthetic-denial agent, so the repo no longer overclaims a placeholder agent.
 - Landing page to demo gate handoff
 - Local Next.js demonstration UI with sample PDF import, run API, trace,
   result, citations, MongoDB before/after diff, and save-as-rule
+- Cost-approved Cloud Run deployment with hosted health/sample-PDF path verified
 
 Next systems:
 
-- System 17: deploy to Cloud Run after explicit cost approval, then verify
-  hosted sample-PDF processing, Cloud Run IAM, and Atlas connectivity
-- System 18: hosted dress rehearsal and backup recording
+- System 18: hosted browser dress rehearsal and backup recording
 - System 19: README/submission assets with honest stack claims
+
+Hosted demo:
+
+```text
+https://claimcompass-demo-ss3fmrraoa-uc.a.run.app
+```
 
 ## Local Setup
 
@@ -299,5 +304,4 @@ Useful references:
 
 ## License
 
-License is not finalized yet. Add a root `LICENSE` before the final Devpost
-submission.
+Apache-2.0. See [`LICENSE`](LICENSE).

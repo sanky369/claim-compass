@@ -1,10 +1,34 @@
 # ClaimCompass Deployment Notes
 
-Last updated: 2026-06-03
+Last updated: 2026-06-09
 
 This is the System 17 deployment integration plan for the hackathon demo.
 Deployment is intentionally guarded because Cloud Run, Cloud Build, Artifact
 Registry, Gemini, Document AI, and network egress can create billable usage.
+
+## Current Hosted Demo
+
+- URL: `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`
+- Service: `claimcompass-demo`
+- Region: `us-central1`
+- Current serving revision: `claimcompass-demo-00004-hwv`
+- Traffic: `100%` to latest revision
+- Min instances: `0`
+- Max instances: `2`
+- Runtime service account:
+  `834613361298-compute@developer.gserviceaccount.com`
+
+Verified on 2026-06-09:
+
+- `/api/health` returns `ok`.
+- `/api/demo/sample-pdf` returns
+  `golden-bcbs-tx-90837-missing-modifier-eob.pdf` as `application/pdf`.
+- `/api/demo/run` with `mode: "sample_pdf"` completed from Cloud Run with run
+  id `run_1781030894860_7d4c600d`.
+- Result page `/demo/denials/demo_denial_001?run=run_1781030894860_7d4c600d`
+  renders the trace, source PDF/GCS URI, corrected-claim guidance, citations,
+  MongoDB write-back proof, and save-as-rule action.
+- Save-as-rule endpoint has been verified on the hosted app.
 
 ## Current Target
 
@@ -14,8 +38,11 @@ Registry, Gemini, Document AI, and network egress can create billable usage.
 - Min instances: `0` by default
 - Max instances: `2` for hackathon cost control
 - Frontend/API: Next.js app with server-side route handlers
-- Agent execution path: server route calls the existing RootAgent and
-  DrafterAgent smoke scripts, which use Gemini and MongoDB MCP.
+- Agent execution path: local release checks run the full RootAgent and
+  DrafterAgent smoke scripts with Gemini, Document AI, MongoDB MCP, and Atlas
+  Vector Search. The hosted Cloud Run demo uses a fast deterministic route for
+  recording stability while preserving the same synthetic denial, artifact,
+  trace, citations, and MongoDB write-back proof.
 
 ## Required Secrets
 
@@ -108,6 +135,20 @@ More production-like option:
 For final testing, record which option was used in the submission checklist and
 clean up any temporary broad allowlist entry after the video is captured.
 
+Current final-recording choice:
+
+- Temporary Atlas `0.0.0.0/0` allowlist is enabled for Cloud Run egress.
+- It is marked `TEMP ClaimCompass Cloud Run final recording; remove after
+  Devpost`.
+- It expires automatically on `2026-06-12T00:00:00Z`.
+- Remove it manually immediately after recording/submission if possible:
+
+```bash
+atlas accessLists delete 0.0.0.0/0 \
+  --projectId 6a184fe615d35c4c48801c17 \
+  --force
+```
+
 ## Cost Notes
 
 - Keep Cloud Run `min-instances=0` until the final recording window.
@@ -115,6 +156,10 @@ clean up any temporary broad allowlist entry after the video is captured.
 - Do not upgrade Atlas from M0.
 - Do not paste real PHI or real payer documents into the hosted demo.
 - Remove any temporary broad Atlas network allowlist entry after submission.
+- Google Cloud budgets exist for project `claimcompass-497412`: `Budget for
+  ClaimCompass` at INR 1000 and `ClaimCompass Hackathon Budget` at INR 4500,
+  both with 50%, 90%, and 100% thresholds. These are alerts, not hard spend
+  caps.
 
 ## Official References
 

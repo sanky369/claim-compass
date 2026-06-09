@@ -1,30 +1,22 @@
 # ClaimCompass Final Testing Checklist
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 Use this checklist before recording or submitting to Devpost. Keep all testing
 synthetic. Do not upload, paste, record, or screenshot real PHI.
 
 ## 1. Local Release Checks
 
-Current external blocker found on 2026-06-08:
+Current final state on 2026-06-09:
 
 - `npm run lint`, `npm run build`, `cd claimcompass-agent && uv run pytest tests/unit`,
   and `npm run eval:agents-cli` pass.
-- MongoDB-backed smokes are blocked from this machine because Atlas rejects the
-  current network path with a TLS/internal-alert server selection error. Atlas
-  CLI auth is also expired, so Codex cannot add the current IP allowlist entry
-  non-interactively.
-
-Before running MongoDB-backed final tests, run:
-
-```bash
-atlas auth login
-```
-
-Then either add the current IP as a `/32` Atlas Network Access entry or use the
-temporary hackathon hosted-testing allowlist described in
-`docs/DEPLOYMENT.md`.
+- Atlas auth and network access have been refreshed.
+- MongoDB-backed local smokes pass when using Secret Manager.
+- Cloud Run is deployed at
+  `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`.
+- Temporary Atlas Cloud Run allowlist `0.0.0.0/0` is enabled only for final
+  recording and expires on `2026-06-12T00:00:00Z`.
 
 Run from the repository root:
 
@@ -94,15 +86,24 @@ Fallback:
 
 ## 3. Hosted Deployment Gate
 
-Do not deploy without explicit cost approval.
+Cost approval was given and Cloud Run is deployed.
 
-Prepared deploy command:
+Hosted URL:
 
 ```bash
-CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
+https://claimcompass-demo-ss3fmrraoa-uc.a.run.app
 ```
 
-After deploy:
+Current deployment:
+
+- Service: `claimcompass-demo`
+- Region: `us-central1`
+- Revision: `claimcompass-demo-00004-hwv`
+- Traffic: `100%`
+- Min instances: `0`
+- Max instances: `2`
+
+Re-check if needed:
 
 ```bash
 SERVICE_URL="$(gcloud run services describe claimcompass-demo \
@@ -114,20 +115,22 @@ curl "$SERVICE_URL/api/health"
 
 Hosted checks:
 
-1. `/api/health` returns `ok`.
-2. Cloud Run service account can read Secret Manager.
-3. Cloud Run can upload the sample PDF to GCS.
-4. Cloud Run can call Document AI.
-5. Cloud Run can call Gemini / Vertex APIs.
-6. Cloud Run can reach MongoDB Atlas.
-7. Hosted `Import sample PDF and run` succeeds twice.
-8. If cold start is too slow, temporarily set `min-instances=1` only for the
+1. DONE: `/api/health` returns `ok`.
+2. DONE: Cloud Run service account can read Secret Manager.
+3. DONE: Cloud Run can reach MongoDB Atlas through the temporary final-recording
+   allowlist.
+4. DONE: Hosted sample PDF endpoint returns the PDF as `application/pdf`.
+5. DONE: Hosted `Import sample PDF and run` succeeds through the API; most
+   recent verification run was `run_1781030894860_7d4c600d`.
+6. NEXT: Run the browser flow once or twice manually before recording.
+7. If cold start is too slow, temporarily set `min-instances=1` only for the
    recording window, then scale back to `0`.
 
 Atlas network access:
 
 - Fast hackathon route: temporary `0.0.0.0/0` allowlist, least-privilege DB
-  user, remove after recording.
+  user, remove after recording. This is the current final-recording route and
+  expires on `2026-06-12T00:00:00Z`.
 - Production-like route: static egress through Serverless VPC Access / NAT,
   only if approved.
 

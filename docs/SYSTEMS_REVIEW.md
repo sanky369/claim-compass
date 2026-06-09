@@ -1,13 +1,13 @@
 # ClaimCompass Systems Review
 
-Last reviewed: 2026-06-03
+Last reviewed: 2026-06-09
 
 This review summarizes the systems completed against
 `docs/HACKATHON_BP_IMPLEMENTATION.md`. It is intentionally operational: each
 line answers whether the system is built, how it was checked, and what risk
 remains.
 
-## Systems 0-17
+## Systems 0-18
 
 | System | Status | Evidence | Remaining risk |
 |---:|---|---|---|
@@ -28,7 +28,8 @@ remains.
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
 | 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. The confusing paste fallback marker was removed. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
-| 17 | PARTIAL | `.gcloudignore`, `docs/DEPLOYMENT.md`, `/api/health`, guarded `scripts/deploy/cloud-run-frontend.sh`, ClaimCompass-specific ADK app, honest runtime wording, Apache-2.0 `LICENSE`, `docs/FINAL_TESTING.md`, and `docs/SUBMISSION_ASSETS.md` exist. `npm run eval:agents-cli` passes against the ClaimCompass eval set. Required secrets were verified, including GCS bucket. | Actual Cloud Run deploy is pending explicit cost approval. MongoDB-backed smokes are blocked until Atlas Network Access is updated after `atlas auth login`. |
+| 17 | DONE | Cloud Run service `claimcompass-demo` is deployed at `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`, revision `claimcompass-demo-00004-hwv`, with 100% traffic, `min-instances=0`, max scale `2`, Secret Manager access, and hosted health/sample-PDF run verified. | Temporary Atlas `0.0.0.0/0` allowlist is open for final recording and expires on 2026-06-12; remove it manually after submission if possible. |
+| 18 | READY | Hosted sample-PDF API run succeeded from Cloud Run and result page renders the trace, PDF/GCS source, citations, MongoDB write-back proof, and save-as-rule. | Manual browser dress rehearsal and backup recording remain before final Devpost recording. |
 
 ## Latest Verification Commands
 
@@ -39,11 +40,11 @@ npm run draft:smoke
 npm run eval:expanded
 npm run lint
 npm run build
+curl https://claimcompass-demo-ss3fmrraoa-uc.a.run.app/api/health
 ```
 
 ## Current Next Build
 
-System 17 now needs Atlas Network Access fixed, then a cost-approved Cloud Run
-deploy, hosted sample-PDF verification, Cloud Run service account IAM checks,
-and Atlas connectivity proof. Keep `min-instances=0` until final recording QA
-unless cold start is unacceptable.
+System 18 is the next gate: run a manual hosted browser dress rehearsal, record
+a backup take, then finish System 19/20 submission assets. Keep
+`min-instances=0` unless cold start is unacceptable during recording.

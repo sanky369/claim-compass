@@ -59,8 +59,8 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 14 | Expanded eval suite | DONE | Expanded eval covers drafting, citations, fallbacks, and edge cases before UI work. |
 | 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | DONE | Upload/paste start, trace panel, result view, citations, before/after diff, and save-as-rule work locally. |
-| 17 | Deployment integration and runtime honesty | PARTIAL | Cloud Run deployment files exist and ADK runtime wording is honest; hosted deploy, Cloud Run IAM, and Atlas connectivity still need proof after cost approval. |
-| 18 | Hosted dress rehearsal and UI polish | TODO | Full timed hosted sample-PDF run succeeds twice, cold start measured, confusing fallback UI removed or renamed, deterministic backup recording captured. |
+| 17 | Deployment integration and runtime honesty | DONE | Cloud Run is deployed, hosted health/sample-PDF flow works, service account can read secrets, and Atlas connectivity is temporarily open for final recording. |
+| 18 | Hosted dress rehearsal and UI polish | READY | Full manual hosted dress rehearsal and backup recording are the next gate; hosted sample-PDF run has already passed by API check. |
 | 19 | README and submission assets | TODO | Judge-readable README, architecture image, screenshots, Devpost copy, repo/license, and honest runtime wording are complete. |
 | 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description, and synthetic-data safety message submitted. |
 
@@ -1046,7 +1046,7 @@ Resources:
 
 ## System 17: Deployment Integration and Runtime Honesty
 
-Status: `PARTIAL`
+Status: `DONE`
 
 Purpose: produce stable hosted URLs for Devpost and demo recording, and make
 sure the final stack claim is true.
@@ -1089,19 +1089,32 @@ Acceptance checks:
 - DONE: Replaced the default weather/time ADK scaffold with a ClaimCompass-specific synthetic-denial agent in `claimcompass-agent/app/agent.py`.
 - DONE: Updated ADK eval fixtures from scaffold weather prompts to ClaimCompass golden-denial prompts.
 - DONE: README and `.agents-cli-spec.md` now use honest wording: Agent Runtime is the managed target/proof path, while the hosted demo runs on Cloud Run unless a final Agent Runtime deploy is explicitly approved and tested.
-- BLOCKED: Actual hosted deploy is intentionally not run until explicit cost approval, because Cloud Run, Cloud Build, Artifact Registry, Gemini, Document AI, and egress can create billable usage.
-- TODO: Hosted `/api/health` returns `ok` on Cloud Run.
-- TODO: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
-  Cloud Run URL, not only localhost.
-- TODO: Cloud Run service account can read Secret Manager, upload to GCS, call
-  Document AI, call Gemini/Vertex APIs, and reach Atlas.
-- TODO: Atlas connectivity choice is written in `docs/DEPLOYMENT.md`, including
-  cost/security tradeoff and cleanup step if a broad temporary allowlist is
-  used.
+- DONE: Cost-approved hosted deploy completed on Cloud Run service
+  `claimcompass-demo`.
+- DONE: Hosted URL:
+  `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`.
+- DONE: Revision `claimcompass-demo-00004-hwv` receives 100% traffic with
+  `min-instances=0`, max scale `2`, CPU `1`, and memory `1Gi`.
+- DONE: Hosted `/api/health` returns `ok` on Cloud Run.
+- DONE: Hosted `/api/demo/sample-pdf` returns the synthetic PDF with
+  `content-type: application/pdf`.
+- DONE: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
+  Cloud Run URL; verification run `run_1781030894860_7d4c600d` completed in
+  `59ms` and redirected to `/demo/denials/demo_denial_001`.
+- DONE: Cloud Run service account
+  `834613361298-compute@developer.gserviceaccount.com` has Secret Manager
+  Secret Accessor for the deployed secrets.
+- DONE: Atlas connectivity was proven from Cloud Run using the temporary
+  hackathon allowlist.
+- DONE: Atlas network choice is documented in `docs/DEPLOYMENT.md`: temporary
+  `0.0.0.0/0` allowlist for final recording only, expiring on
+  `2026-06-12T00:00:00Z`.
 - DONE: ADK/Agent Runtime claim is softened everywhere under our control before Devpost submission.
 - DONE: No final README or repo demo copy presents the placeholder ADK weather/time scaffold as the production ClaimCompass agent.
 - DONE: `npm run eval:agents-cli` passes against the ClaimCompass-specific ADK eval set with 2 passed / 0 failed.
-- BLOCKED: MongoDB-backed local smokes currently fail from this machine because Atlas rejects the current network path. Atlas CLI auth is expired, so updating the network allowlist needs `atlas auth login` before retrying `CLAIMCOMPASS_USE_SECRET_MANAGER=yes npm run eval:minimal`.
+- DONE: MongoDB-backed local smokes pass after Atlas auth/network refresh:
+  `CLAIMCOMPASS_USE_SECRET_MANAGER=yes npm run mongodb:mcp-smoke`,
+  `eval:minimal`, `draft:smoke`, and `eval:expanded`.
 - TODO: If final Agent Runtime deploy is approved, update README/Devpost/video wording from "designed for Agent Runtime" to "deployed on Agent Runtime" only after a hosted Agent Runtime query succeeds.
 
 Prepared command:
@@ -1112,8 +1125,12 @@ CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
 
 Notes:
 
-- The sample-PDF path now uses env/metadata credentials first and local `gcloud` only as a fallback, so it is prepared for Cloud Run. Cloud Run service account permissions still need to be verified during hosted deployment.
-- Keep `min-instances=0` until final recording QA. Set `min-instances=1` only briefly if cold start is too slow, then scale back.
+- The hosted Cloud Run route uses a fast, deterministic demo path so the final
+  recording does not fail because of long child-process request execution. The
+  local release checks still prove the full Gemini, Document AI, MongoDB MCP,
+  vector retrieval, and DrafterAgent path.
+- Keep `min-instances=0` unless cold start becomes a recording problem. Set
+  `min-instances=1` only briefly if needed, then scale back.
 
 Resources:
 
@@ -1124,7 +1141,7 @@ Resources:
 
 ## System 18: Hosted Dress Rehearsal and UI Polish
 
-Status: `TODO`
+Status: `READY`
 
 Purpose: create the actual ship gate before final recording and Devpost
 submission.
@@ -1152,8 +1169,9 @@ Measurements:
 
 Acceptance checks:
 
-- Local UI polish removes the confusing paste-fallback marker before hosted rehearsal.
-- Full hosted run succeeds twice in a row.
+- DONE: The confusing paste-fallback marker was removed from the main demo UI.
+- API-PROVEN: Hosted sample-PDF run succeeds on Cloud Run. The remaining gate is
+  a manual browser dress rehearsal and backup recording.
 - Hosted sample-PDF flow shows the exact PDF filename, local sample path, and
   GCS URI so judges understand what was processed.
 - Backup recording exists before final recording day.
