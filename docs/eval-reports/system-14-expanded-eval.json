@@ -2,8 +2,8 @@
   "ok": true,
   "system": 14,
   "name": "expanded_eval_suite",
-  "created_at": "2026-06-03T16:10:30.553Z",
-  "elapsed_ms": 34230,
+  "created_at": "2026-06-09T18:29:51.760Z",
+  "elapsed_ms": 35328,
   "root_summary": {
     "denial_id": "demo_denial_001",
     "bucket": "corrected_claim",
@@ -18,7 +18,7 @@
   },
   "draft_summary": {
     "denial_id": "demo_denial_001",
-    "artifact_id": "artifact_demo_denial_001_1780503028068_824632e3",
+    "artifact_id": "artifact_demo_denial_001_1781029789319_a430d560",
     "citation_ids": [
       "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
       "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
@@ -138,7 +138,7 @@
         {
           "pass": true,
           "message": "Artifact id returned.",
-          "details": "artifact_demo_denial_001_1780503028068_824632e3"
+          "details": "artifact_demo_denial_001_1781029789319_a430d560"
         }
       ],
       "failures": []
