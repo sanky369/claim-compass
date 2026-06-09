@@ -126,7 +126,7 @@ export function buildPlaybookChunks() {
             theme: theme.theme,
             action_bucket: theme.action_bucket,
           },
-          embedding_model: "gemini-embedding-001",
+          embedding_model: process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2",
           embedding_dimensions: 1536,
           embedding: null,
           created_at: now,

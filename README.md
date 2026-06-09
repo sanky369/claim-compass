@@ -35,7 +35,7 @@ agent loop:
 | Frontend | Next.js App Router |
 | Agent framework | Google ADK / Agents CLI |
 | Agent runtime target | Google Cloud Agent Runtime / Vertex AI Agent Engine |
-| Models | Gemini generation and `gemini-embedding-001` embeddings |
+| Models | `gemini-3.5-flash` generation and `gemini-embedding-2` embeddings |
 | OCR | Google Document AI Form Parser |
 | Database | MongoDB Atlas |
 | Retrieval | MongoDB Atlas Vector Search |
@@ -45,7 +45,7 @@ agent loop:
 
 Hosted demo integrity:
 
-- Every hosted run performs live `gemini-embedding-001` query embedding.
+- Every hosted run performs live `gemini-embedding-2` query embedding at 1536 dimensions.
 - Every hosted run performs live MongoDB MCP `aggregate` with `$vectorSearch`,
   MCP `find`, MCP `update-many`, and MCP `insert-many`.
 - The hosted path labels Document AI extraction and DrafterAgent generation as
@@ -113,7 +113,7 @@ Next systems:
 Hosted demo:
 
 ```text
-https://claimcompass-demo-ss3fmrraoa-uc.a.run.app
+https://claimcompass-demo-834613361298.us-central1.run.app
 ```
 
 ## Local Setup
@@ -236,7 +236,7 @@ The smoke query uses an MCP `aggregate` call with this `$vectorSearch` shape:
     $vectorSearch: {
       index: "playbook_vec",
       path: "embedding",
-      queryVector: "<1536-dim gemini-embedding-001 vector>",
+      queryVector: "<1536-dim gemini-embedding-2 vector>",
       numCandidates: 30,
       limit: 5,
       filter: {

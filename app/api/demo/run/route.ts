@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const execFileAsync = promisify(execFile);
-const embeddingModel = "gemini-embedding-001";
+const embeddingModel = process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2";
 const embeddingDimensions = 1536;
 
 function parseJsonOutput(stdout: string) {
@@ -137,11 +137,17 @@ async function embedHostedQuery(query: string) {
   });
   const response = await ai.models.embedContent({
     model: embeddingModel,
-    contents: query,
-    config: {
-      taskType: "RETRIEVAL_QUERY",
-      outputDimensionality: embeddingDimensions,
-    },
+    contents:
+      embeddingModel === "gemini-embedding-2"
+        ? `task: search result | query: ${query}`
+        : query,
+    config:
+      embeddingModel === "gemini-embedding-2"
+        ? { outputDimensionality: embeddingDimensions }
+        : {
+            taskType: "RETRIEVAL_QUERY",
+            outputDimensionality: embeddingDimensions,
+          },
   });
   const values = response.embeddings?.[0]?.values;
   if (!Array.isArray(values) || values.length !== embeddingDimensions) {

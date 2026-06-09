@@ -3,10 +3,14 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { execFileSync } from "node:child_process";
 import { dirname } from "node:path";
+import {
+  embeddingDimensions,
+  embeddingModel,
+  retrievalQueryConfig,
+  retrievalQueryContent,
+} from "../lib/gemini-embeddings.mjs";
 import { requireMongoEnv } from "../mongodb/env.mjs";
 
-const embeddingModel = "gemini-embedding-001";
-const embeddingDimensions = 1536;
 const denialId = process.env.DENIAL_ID || "demo_denial_001";
 
 function gcloud(args) {
@@ -75,11 +79,8 @@ async function call(client, name, args) {
 async function embedQuery(ai, query) {
   const response = await ai.models.embedContent({
     model: embeddingModel,
-    contents: query,
-    config: {
-      taskType: "RETRIEVAL_QUERY",
-      outputDimensionality: embeddingDimensions,
-    },
+    contents: retrievalQueryContent(query),
+    config: retrievalQueryConfig(),
   });
   const values = response.embeddings?.[0]?.values;
   if (!Array.isArray(values) || values.length !== embeddingDimensions) {

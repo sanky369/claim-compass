@@ -2,8 +2,8 @@
   "ok": true,
   "system": 12,
   "name": "minimal_eval_gate",
-  "created_at": "2026-06-09T18:29:08.427Z",
-  "elapsed_ms": 23732,
+  "created_at": "2026-06-09T22:24:26.559Z",
+  "elapsed_ms": 11006,
   "notes": [
     "agents-cli eval run was verified separately against the ADK scaffold.",
     "This eval gates the real ClaimCompass RootAgent/MongoDB/Gemini smoke path."

@@ -102,7 +102,7 @@ def decode_claimcompass_golden_denial(denial_id: str = GOLDEN_DENIAL_ID) -> dict
 root_agent = Agent(
     name="claimcompass_agent",
     model=Gemini(
-        model="gemini-flash-latest",
+        model="gemini-3.5-flash",
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
     instruction=(

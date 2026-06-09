@@ -63,7 +63,7 @@ The MongoDB resource page frames Atlas as a unified operational foundation and p
 - **MongoDB MCP Server:** the app/agent path accesses MongoDB through the official MCP server tools, especially `find`, `aggregate`, `insert-many`, `update-many`, and `count`.
 - **MongoDB Aggregations:** PolicyAgent retrieval is not a direct vector SDK call; it is an MCP `aggregate` call whose first stage is `$vectorSearch`, followed by `$project`.
 - **MongoDB Atlas Search:** optional for v1. If time permits, use Atlas Search only for lexical backup over payer playbooks; do not add it before the vector-search golden path is polished.
-- **Bring-your-own Google embeddings:** use `gemini-embedding-001`. Do **not** use Voyage AI embedding generation in the runtime, because the hackathon requires Google Cloud AI tools for AI functionality.
+- **Bring-your-own Google embeddings:** use `gemini-embedding-2` at 1536 dimensions. Do **not** use Voyage AI embedding generation in the runtime, because the hackathon requires Google Cloud AI tools for AI functionality.
 - **No sample Mflix dependency:** the Mflix dataset is a useful resource, but ClaimCompass uses newly authored healthcare denial demo data so the submission remains domain-specific and IP-clean.
 
 ---
@@ -166,13 +166,13 @@ The MongoDB resource page frames Atlas as a unified operational foundation and p
 | Hosting | **Cloud Run** | `min-instances=1` during demo window. |
 | Agent platform | **Google Cloud Agent Builder / Gemini Enterprise Agent Platform** | Umbrella suite named in the hackathon brief. We use the code-first path, not the low-code Studio path. |
 | Agent framework/runtime | **Google ADK** deployed to **Agent Runtime / Vertex AI Agent Engine** | ADK is the code-first builder; Agent Runtime / Agent Engine is the managed deployment target. |
-| Model — root + drafter | **Configured Gemini generation model** | Defaults to `gemini-flash-latest` unless `GEMINI_DRAFT_MODEL` is pinned. Do not claim Gemini 3 unless the deployed model ID is verified. |
-| Model — policy + extraction | **Gemini embeddings** | Uses `gemini-embedding-001` for query/playbook embeddings. |
+| Model — root + drafter | **`gemini-3.5-flash`** | Stable Google model ID verified against the Agent Platform docs and the project. Override with `GEMINI_DRAFT_MODEL` only if needed. |
+| Model — policy + extraction | **Gemini embeddings** | Uses `gemini-embedding-2` for query/playbook embeddings. |
 | OCR | **Document AI Form Parser** | Text + key/value + tables. $30 / 1,000 pages — negligible at demo scale. |
 | Primary DB | **MongoDB Atlas** (M10, co-located region with Cloud Run) | One cluster, all collections. |
 | Vector search | **MongoDB Atlas Vector Search** via `$vectorSearch` aggregation stage | Native. |
 | MCP server | **Official MongoDB MCP Server** | Wired into ADK via `McpToolset`. |
-| Embeddings | **`gemini-embedding-001`** with `output_dimensionality=1536` | Google-only AI rule. We store the vectors in Atlas ourselves; do not configure MCP/Voyage automatic embeddings for runtime. |
+| Embeddings | **`gemini-embedding-2`** with `output_dimensionality=1536` | Google-only AI rule. We store the vectors in Atlas ourselves; do not configure MCP/Voyage automatic embeddings for runtime. |
 | Atlas Search | Optional fallback only | Keep out of v1 unless vector retrieval is already solid. If added, use it as a lexical comparison in README/demo, not as a replacement for Vector Search. |
 | Storage | Cloud Storage bucket | Uploaded EOB PDFs. |
 | Auth | None (demo route) or Identity-Aware Proxy if needed | Don't burn a day on auth. |
@@ -211,7 +211,7 @@ Three agents. Each has one job, one IO contract, and a small tool set. Every Mon
 ### 5.2 PolicyAgent (Gemini embeddings)
 - **Input:** `{payer_id, cpt, raw_text}`.
 - **Tools:**
-  - Vertex `embed_content(model="gemini-embedding-001", output_dimensionality=1536)` — registered as a tool function.
+  - Vertex `embed_content(model="gemini-embedding-2", output_dimensionality=1536)` — registered as a tool function.
   - MongoDB MCP: `aggregate` against `payer_playbooks`, first stage `$vectorSearch`.
   - MongoDB MCP: `find` against `carc`, `rarc`.
 - **Pipeline (`$vectorSearch` aggregation):**
@@ -333,7 +333,7 @@ Agent run · denial_id 6644a…
 ✓  RootAgent          documentai.process  Form Parser         3.4 s
 ✓  RootAgent          mcp.update-many     denials             22 ms
    → ocr_status: "done", extracted CO-45 + N179, CPT 90837
-✓  PolicyAgent        gemini.embed        gemini-embedding-001 410 ms
+✓  PolicyAgent        gemini.embed        gemini-embedding-2 410 ms
 ✓  PolicyAgent        mcp.aggregate       payer_playbooks      47 ms
    → $vectorSearch returned 5 chunks (top score 0.91)
 ✓  PolicyAgent        mcp.find            carc, rarc           14 ms
@@ -395,7 +395,7 @@ Pair it with a **Before / After** MongoDB JSON diff panel that renders the same 
 | **1** | New public GitHub repo, Apache-2.0 license, GCP project, billing/budget alerts on. Enable Agent Platform / Vertex AI, Document AI, Cloud Run, Cloud Build, Artifact Registry, Secret Manager, Storage, Logging/Monitoring/Trace APIs. Atlas M10 cluster + a fresh service user. Cloud Run hello-world deployed. |
 | **2** | Agents CLI / ADK skeleton. Create `.agents-cli-spec.md`. Wire **MongoDB MCP server** into ADK via `McpToolset`. Put MongoDB and Google config in Secret Manager / env. Smoke-test `find`, `aggregate`, `update-many`, `insert-many` from a RootAgent stub. Create `denials`, `payer_playbooks`, `generated_artifacts`, `trace_events` collections. |
 | **3** | Document AI Form Parser tool function. End-to-end: synthetic PDF → GCS → Form Parser → extracted fields → `update-many` denial. |
-| **4** | Author **30–60 payer playbook chunks** from scratch (2 payers × 3 CPT families × 5 themes). Generate embeddings with `gemini-embedding-001` at 1536 dims. Insert via MCP `insert-many`. Create and verify the `playbook_vec` Atlas Vector Search index (`create-index` via MCP or Atlas UI/script). |
+| **4** | Author **30–60 payer playbook chunks** from scratch (2 payers × 3 CPT families × 5 themes). Generate embeddings with `gemini-embedding-2` at 1536 dims. Insert via MCP `insert-many`. Create and verify the `playbook_vec` Atlas Vector Search index (`create-index` via MCP or Atlas UI/script). |
 | **5** | PolicyAgent. `gemini.embed` tool + `$vectorSearch` aggregation. Verify top-k retrieval is sane on the golden denial. |
 | **6** | RootAgent bucket classification on retrieved context. Confidence threshold + fallback. Agents CLI eval on a small in-repo set of 5 denials covering 3 buckets; do not use pytest assertions for LLM wording. |
 | **7** | DrafterAgent. Generates corrected-claim guidance with citation chips. Citation validation post-processor. `insert-many` artifact + `update-many` denial. |
@@ -417,7 +417,7 @@ This section exists so we can defend the submission if challenged.
 
 - **Newly created work:** the GitHub repo is created fresh on day 1 of the build window. Every commit is dated inside the window. The blueprint document is internal planning and not part of the submission. No prompts, embeddings, seed data, EOB samples, code, or design assets are carried over from any prior project. The README does not reference any earlier work.
 - **Google Cloud Agent Builder compliance:** ClaimCompass uses the code-first Agent Builder path: Google ADK for agent orchestration, deployed to Agent Runtime / Vertex AI Agent Engine. We avoid relying on Agent Studio because the demo needs custom MCP, Document AI, trace persistence, and deterministic evals.
-- **AI tools used:** Gemini generation, Gemini Embedding (`gemini-embedding-001`), and Document AI Form Parser — all Google Cloud. MongoDB Atlas Vector Search is part of the chosen partner's product stack and is used directly (no third-party LLM behind it). No Claude, no OpenAI, no third-party OCR AI is invoked at runtime.
+- **AI tools used:** Gemini generation (`gemini-3.5-flash`), Gemini Embedding (`gemini-embedding-2`), and Document AI Form Parser — all Google Cloud. MongoDB Atlas Vector Search is part of the chosen partner's product stack and is used directly (no third-party LLM behind it). No Claude, no OpenAI, no third-party OCR AI is invoked at runtime.
 - **Partner MCP server:** the official MongoDB MCP server is integrated into the app path. Agent database reads/writes go through MCP tools (`find`, `aggregate`, `update-many`, `insert-many`, `count`) — visible in the in-app trace panel.
 - **Third-party IP:** no real payer logos, no real EOBs, no copy-pasted policy bulletins, no real patient identifiers. Playbook chunks are paraphrased rules with `source_url` pointers to publicly available X12 / CMS references.
 - **License:** Apache-2.0 at repo root.

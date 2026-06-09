@@ -28,8 +28,8 @@ remains.
 | 14 | DONE | `npm run eval:expanded` passed RootAgent, DrafterAgent, citation, and fallback cases. | Edge cases are fixtures, not broad payer/claim support. |
 | 15 | DONE | `npm run lint` clean; `npm run dev` served `/`, `/signin`, and `/demo/denials/new` at `200`. Landing CTAs route into a one-button demo gate, then the placeholder upload/paste page. | Gate is a demo marker cookie, not real auth; the upload/paste page is a System 16 placeholder. |
 | 16 | DONE | `GET /api/demo/sample-pdf` serves the exact PDF; `POST /api/demo/run` with `mode: "sample_pdf"` returned `200`; result page shows source PDF, GCS URI, trace, citations, diff, save-as-rule; `POST /api/demo/rules` returned `200`. The confusing paste fallback marker was removed. `npm run lint` and `npm run build` pass. | Sample-PDF mode uses the synthetic golden PDF only; arbitrary user PDF upload remains out of scope for PHI safety. |
-| 17 | DONE | Cloud Run service `claimcompass-demo` is deployed at `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`, revision `claimcompass-demo-00006-n7p`, with 100% traffic, `min-instances=0`, max scale `2`, Secret Manager access, and hosted health/sample-PDF run verified. The hosted branch returns `live_mcp: true` with live Gemini embedding plus MongoDB MCP `$vectorSearch`, `find`, `update-many`, and `insert-many`. | Temporary Atlas `0.0.0.0/0` allowlist is open and expires on 2026-06-12. |
-| 18 | READY | Hosted sample-PDF API run `run_1781036034323_405e5753` completed in 14747ms with live MCP proof, result page shows only fresh run-scoped trace rows, and save-as-rule `rule_1781036075633_fe26ed26` wrote through MCP `insert-many`. | Manual hosted browser dress rehearsal and backup recording remain before final Devpost recording. |
+| 17 | DONE | Cloud Run service `claimcompass-demo` is deployed at `https://claimcompass-demo-834613361298.us-central1.run.app`, revision `claimcompass-demo-00007-6gr`, with 100% traffic, `min-instances=0`, max scale `2`, Secret Manager access, and hosted health/sample-PDF run verified. The hosted branch returns `live_mcp: true` with live `gemini-embedding-2` plus MongoDB MCP `$vectorSearch`, `find`, `update-many`, and `insert-many`. | Temporary Atlas `0.0.0.0/0` allowlist is open and expires on 2026-06-12. |
+| 18 | READY | Hosted sample-PDF API run `run_1781044169208_dc0e5ff1` completed in 8331ms with live MCP proof, result page shows only fresh run-scoped trace rows, and save-as-rule `rule_1781044214675_6b177cf2` wrote through MCP `insert-many`. | Manual hosted browser dress rehearsal and backup recording remain before final Devpost recording. |
 
 ## Latest Verification Commands
 
@@ -40,7 +40,7 @@ npm run draft:smoke
 npm run eval:expanded
 npm run lint
 npm run build
-curl https://claimcompass-demo-ss3fmrraoa-uc.a.run.app/api/health
+curl https://claimcompass-demo-834613361298.us-central1.run.app/api/health
 ```
 
 ## Current Next Build

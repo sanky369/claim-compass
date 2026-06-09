@@ -2,8 +2,8 @@
   "ok": true,
   "system": 14,
   "name": "expanded_eval_suite",
-  "created_at": "2026-06-09T18:29:51.760Z",
-  "elapsed_ms": 35328,
+  "created_at": "2026-06-09T22:24:53.341Z",
+  "elapsed_ms": 37132,
   "root_summary": {
     "denial_id": "demo_denial_001",
     "bucket": "corrected_claim",
@@ -18,13 +18,15 @@
   },
   "draft_summary": {
     "denial_id": "demo_denial_001",
-    "artifact_id": "artifact_demo_denial_001_1781029789319_a430d560",
+    "artifact_id": "artifact_demo_denial_001_1781043890904_6df2bf2f",
     "citation_ids": [
       "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
       "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
-      "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+      "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
     ],
-    "model": "gemini-flash-latest"
+    "model": "gemini-3.5-flash"
   },
   "cases": [
     {
@@ -74,18 +76,26 @@
             "citations": [
               "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
               "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
-              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
             ],
             "invalid_citations": [],
             "forbidden_matches": [],
             "has_human_review_disclaimer": true,
-            "gemini_output_required_repair": true,
+            "gemini_output_required_repair": false,
             "original_validation": {
-              "ok": false,
-              "citations": [],
+              "ok": true,
+              "citations": [
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+              ],
               "invalid_citations": [],
               "forbidden_matches": [],
-              "has_human_review_disclaimer": false
+              "has_human_review_disclaimer": true
             }
           }
         },
@@ -97,18 +107,26 @@
             "citations": [
               "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
               "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
-              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
             ],
             "invalid_citations": [],
             "forbidden_matches": [],
             "has_human_review_disclaimer": true,
-            "gemini_output_required_repair": true,
+            "gemini_output_required_repair": false,
             "original_validation": {
-              "ok": false,
-              "citations": [],
+              "ok": true,
+              "citations": [
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+              ],
               "invalid_citations": [],
               "forbidden_matches": [],
-              "has_human_review_disclaimer": false
+              "has_human_review_disclaimer": true
             }
           }
         },
@@ -120,25 +138,33 @@
             "citations": [
               "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
               "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
-              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01"
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+              "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
             ],
             "invalid_citations": [],
             "forbidden_matches": [],
             "has_human_review_disclaimer": true,
-            "gemini_output_required_repair": true,
+            "gemini_output_required_repair": false,
             "original_validation": {
-              "ok": false,
-              "citations": [],
+              "ok": true,
+              "citations": [
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_pos_mismatch_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_prior_auth_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_timely_filing_01",
+                "pb_bcbs_tx_demo_psychotherapy_90_codes_units_mismatch_01"
+              ],
               "invalid_citations": [],
               "forbidden_matches": [],
-              "has_human_review_disclaimer": false
+              "has_human_review_disclaimer": true
             }
           }
         },
         {
           "pass": true,
           "message": "Artifact id returned.",
-          "details": "artifact_demo_denial_001_1781029789319_a430d560"
+          "details": "artifact_demo_denial_001_1781043890904_6df2bf2f"
         }
       ],
       "failures": []

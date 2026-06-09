@@ -24,7 +24,7 @@ CPT `90837`, missing telehealth modifier `95`, denial codes `CO-45` and `N179`.
 The user opens the synthetic PDF, starts the run, and watches ClaimCompass:
 
 - use the verified synthetic Document AI extraction for the sample PDF;
-- run a live `gemini-embedding-001` query embedding;
+- run a live `gemini-embedding-2` query embedding;
 - retrieve synthetic payer playbook guidance through live MongoDB MCP
   `aggregate` with `$vectorSearch`;
 - use MongoDB MCP `find`, `update-many`, and `insert-many` for hosted

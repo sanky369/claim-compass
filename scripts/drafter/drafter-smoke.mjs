@@ -5,7 +5,7 @@ import { callMcp, parseMcpDocuments, withMcp } from "../lib/mcp-client.mjs";
 import { requireMongoEnv } from "../mongodb/env.mjs";
 
 const denialId = process.env.DENIAL_ID || "demo_denial_001";
-const generationModel = process.env.GEMINI_DRAFT_MODEL || "gemini-flash-latest";
+const generationModel = process.env.GEMINI_DRAFT_MODEL || "gemini-3.5-flash";
 
 function gcloud(args) {
   return execFileSync("gcloud", args, {
@@ -157,12 +157,20 @@ async function draftWithGemini(ai, prompt) {
     contents: prompt,
     config: {
       temperature: 0.2,
-      maxOutputTokens: 1200,
+      maxOutputTokens: 4096,
     },
   });
   const markdown = response.text?.trim();
   if (!markdown) {
-    throw new Error("Gemini returned an empty draft.");
+    throw new Error(
+      `Gemini returned an empty draft: ${JSON.stringify({
+        model: generationModel,
+        candidates: response.candidates?.map((candidate) => ({
+          finishReason: candidate.finishReason,
+          parts: candidate.content?.parts?.map((part) => Object.keys(part)),
+        })),
+      })}`,
+    );
   }
   return markdown;
 }

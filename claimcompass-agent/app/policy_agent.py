@@ -13,7 +13,7 @@ from google import genai
 from mcp import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
 
-EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_MODEL = os.environ.get("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2")
 EMBEDDING_DIMENSIONS = 1536
 DEFAULT_DATABASE = "claimcompass"
 DEFAULT_PLAYBOOK_LIMIT = 8
@@ -90,14 +90,20 @@ class GeminiEmbedder:
         )
 
     async def embed_query(self, text: str) -> list[float]:
+        if self._model == "gemini-embedding-2":
+            contents = f"task: search result | query: {text}"
+            config = {"output_dimensionality": EMBEDDING_DIMENSIONS}
+        else:
+            contents = text
+            config = {
+                "task_type": "RETRIEVAL_QUERY",
+                "output_dimensionality": EMBEDDING_DIMENSIONS,
+            }
         response = await asyncio.to_thread(
             self._client.models.embed_content,
             model=self._model,
-            contents=text,
-            config={
-                "task_type": "RETRIEVAL_QUERY",
-                "output_dimensionality": EMBEDDING_DIMENSIONS,
-            },
+            contents=contents,
+            config=config,
         )
         values = response.embeddings[0].values if response.embeddings else None
         if not values or len(values) != EMBEDDING_DIMENSIONS:

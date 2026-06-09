@@ -3,11 +3,14 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { execFileSync } from "node:child_process";
 import { dirname } from "node:path";
+import {
+  embeddingDimensions,
+  embeddingModel,
+  retrievalDocumentConfig,
+  retrievalDocumentContent,
+} from "../lib/gemini-embeddings.mjs";
 import { requireMongoEnv } from "../mongodb/env.mjs";
 import { buildPlaybookChunks } from "./corpus.mjs";
-
-const embeddingModel = "gemini-embedding-001";
-const embeddingDimensions = 1536;
 
 function gcloud(args) {
   return execFileSync("gcloud", args, {
@@ -77,12 +80,8 @@ async function connectMcp(uri) {
 async function embedChunk(ai, chunk) {
   const response = await ai.models.embedContent({
     model: embeddingModel,
-    contents: `${chunk.title}\n\n${chunk.body}`,
-    config: {
-      taskType: "RETRIEVAL_DOCUMENT",
-      title: chunk.title,
-      outputDimensionality: embeddingDimensions,
-    },
+    contents: retrievalDocumentContent(chunk),
+    config: retrievalDocumentConfig(chunk.title),
   });
 
   const values = response.embeddings?.[0]?.values;
@@ -107,6 +106,8 @@ async function main() {
     const embedding = await embedChunk(ai, chunk);
     embeddedChunks.push({
       ...chunk,
+      embedding_model: embeddingModel,
+      embedding_dimensions: embeddingDimensions,
       embedding,
       updated_at: new Date().toISOString(),
     });

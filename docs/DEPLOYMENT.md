@@ -8,33 +8,34 @@ Registry, Gemini, Document AI, and network egress can create billable usage.
 
 ## Current Hosted Demo
 
-- URL: `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`
+- URL: `https://claimcompass-demo-834613361298.us-central1.run.app`
 - Service: `claimcompass-demo`
 - Region: `us-central1`
-- Current serving revision: `claimcompass-demo-00006-n7p`
+- Current serving revision: `claimcompass-demo-00007-6gr`
 - Traffic: `100%` to latest revision
 - Min instances: `0`
 - Max instances: `2`
 - Runtime service account:
   `834613361298-compute@developer.gserviceaccount.com`
 
-Verified on 2026-06-09 after the live-MCP hosted refactor:
+Verified on 2026-06-09 after the Gemini 3.5 Flash / Embedding 2 update:
 
 - `/api/health` returns `ok`.
 - `/api/demo/sample-pdf` returns
   `golden-bcbs-tx-90837-missing-modifier-eob.pdf` as `application/pdf`.
 - `/api/demo/run` with `mode: "sample_pdf"` completed from Cloud Run with run
-  id `run_1781036034323_405e5753`.
-- Hosted run returned `live_mcp: true` and completed in `14747ms`.
-- The hosted branch performs live `gemini-embedding-001` embedding and live
+  id `run_1781044169208_dc0e5ff1`.
+- Hosted run returned `live_mcp: true`, `live_gemini_embedding_model:
+  "gemini-embedding-2"`, and completed in `8331ms`.
+- The hosted branch performs live `gemini-embedding-2` embedding and live
   MongoDB MCP `aggregate` with `$vectorSearch`, `find`, `update-many`, and
   `insert-many`.
-- Result page `/demo/denials/demo_denial_001?run=run_1781036034323_405e5753`
+- Result page `/demo/denials/demo_denial_001?run=run_1781044169208_dc0e5ff1`
   renders only the fresh run-scoped trace labels, source PDF/GCS URI,
   corrected-claim guidance, citations, MongoDB write-back proof, and
   save-as-rule action.
 - Save-as-rule endpoint returned `live_mcp: true` with rule id
-  `rule_1781036075633_fe26ed26`.
+  `rule_1781044214675_6b177cf2`.
 
 ## Current Target
 

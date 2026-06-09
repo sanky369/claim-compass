@@ -14,9 +14,9 @@ Current final state on 2026-06-09:
 - Atlas auth and network access have been refreshed.
 - MongoDB-backed local smokes pass when using Secret Manager.
 - Cloud Run is deployed at
-  `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`.
-- The hosted branch on Cloud Run revision `claimcompass-demo-00006-n7p`
-  performs live Gemini embedding plus MongoDB MCP vector retrieval/write-back.
+  `https://claimcompass-demo-834613361298.us-central1.run.app`.
+- The hosted branch on Cloud Run revision `claimcompass-demo-00007-6gr`
+  performs live `gemini-embedding-2` plus MongoDB MCP vector retrieval/write-back.
 - Temporary Atlas Cloud Run allowlist `0.0.0.0/0` is enabled only for final
   recording and expires on `2026-06-12T00:00:00Z`.
 
@@ -93,14 +93,14 @@ Cost approval was given and Cloud Run is deployed.
 Hosted URL:
 
 ```bash
-https://claimcompass-demo-ss3fmrraoa-uc.a.run.app
+https://claimcompass-demo-834613361298.us-central1.run.app
 ```
 
 Current deployment:
 
 - Service: `claimcompass-demo`
 - Region: `us-central1`
-- Revision: `claimcompass-demo-00006-n7p`
+- Revision: `claimcompass-demo-00007-6gr`
 - Traffic: `100%`
 - Min instances: `0`
 - Max instances: `2`
@@ -124,9 +124,9 @@ Hosted checks:
 4. DONE: Hosted sample PDF endpoint returns the PDF as `application/pdf`.
 5. DONE: Hosted `Import sample PDF and run` returns `live_mcp: true` after
    live Gemini embedding and MongoDB MCP retrieval/write-back; verification run
-   was `run_1781036034323_405e5753`.
+   was `run_1781044169208_dc0e5ff1`.
 6. DONE: Hosted save-as-rule returns `live_mcp: true`; verification rule was
-   `rule_1781036075633_fe26ed26`.
+   `rule_1781044214675_6b177cf2`.
 7. NEXT: Run the hosted browser flow once or twice manually before recording.
 7. If cold start is too slow, temporarily set `min-instances=1` only for the
    recording window, then scale back to `0`.

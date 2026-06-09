@@ -1,6 +1,6 @@
 # ClaimCompass Hackathon Implementation Tracker
 
-Last updated: 2026-06-02
+Last updated: 2026-06-09
 
 Primary blueprint: `docs/HACKATHON_BLUEPRINT.md`
 
@@ -50,7 +50,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 5 | MongoDB MCP integration | DONE | MCP smoke passed with `find`, `aggregate`, `insert-many`, `update-many`, and `count`. |
 | 6 | Synthetic demo data | DONE | Clean synthetic EOB PDF plus paste-text fallback exist, no PHI, no payer logos/templates. |
 | 7 | Document AI tool | DONE | PDF in Cloud Storage processes through Document AI and updates the denial doc through MongoDB MCP. |
-| 8 | Playbook chunks and embeddings | DONE | 30 fresh payer playbook chunks embedded with `gemini-embedding-001`. |
+| 8 | Playbook chunks and embeddings | DONE | 30 fresh payer playbook chunks embedded with `gemini-embedding-2`. |
 | 9 | Atlas Vector Search | DONE | `playbook_vec` index exists and `$vectorSearch` returns sane top-k chunks. |
 | 10 | PolicyAgent | DONE | Given denial context, retrieves playbook chunks and CARC/RARC descriptions through MCP. |
 | 11 | RootAgent orchestration and classification | DONE | Runs extract -> retrieve -> classify and writes trace events for the golden denial. |
@@ -582,14 +582,14 @@ Create:
 
 Embedding rule:
 
-- Use Google `gemini-embedding-001`.
+- Use Google `gemini-embedding-2`.
 - Do not use Voyage AI embedding generation in runtime.
 
 Acceptance checks:
 
 - DONE: 30 newly authored synthetic chunks exist for BCBS-TX Demo and Aetna Demo.
 - DONE: Coverage spans three CPT families and five denial themes.
-- DONE: Gemini `gemini-embedding-001` generated 1536-dimensional embeddings.
+- DONE: Gemini `gemini-embedding-2` generated 1536-dimensional embeddings.
 - DONE: Chunks were inserted through MongoDB MCP `insert-many`.
 - DONE: `payer_playbooks` count confirms 30 embedded demo chunks.
 
@@ -1092,24 +1092,25 @@ Acceptance checks:
 - DONE: Cost-approved hosted deploy completed on Cloud Run service
   `claimcompass-demo`.
 - DONE: Hosted URL:
-  `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`.
-- DONE: Revision `claimcompass-demo-00006-n7p` receives 100% traffic with
+  `https://claimcompass-demo-834613361298.us-central1.run.app`.
+- DONE: Revision `claimcompass-demo-00007-6gr` receives 100% traffic with
   `min-instances=0`, max scale `2`, CPU `1`, and memory `1Gi`.
 - DONE: Hosted `/api/health` returns `ok` on Cloud Run.
 - DONE: Hosted `/api/demo/sample-pdf` returns the synthetic PDF with
   `content-type: application/pdf`.
 - DONE: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
   Cloud Run URL.
-- DONE: The hosted branch now performs live `gemini-embedding-001` query
+- DONE: The hosted branch now performs live `gemini-embedding-2` query
   embedding and live MongoDB MCP `aggregate` with `$vectorSearch`, `find`,
   `update-many`, and `insert-many`.
-- DONE: Hosted verification run `run_1781036034323_405e5753` returned
+- DONE: Hosted verification run `run_1781044169208_dc0e5ff1` returned
   `live_mcp: true`, retrieved
-  `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`, and completed
-  in `14747ms`.
+  `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`, reported
+  `live_gemini_embedding_model: "gemini-embedding-2"`, and completed in
+  `8331ms`.
 - DONE: Hosted save-as-rule route now writes through MongoDB MCP `insert-many`
   and returns `live_mcp: true`; hosted verification rule
-  `rule_1781036075633_fe26ed26` succeeded.
+  `rule_1781044214675_6b177cf2` succeeded.
 - DONE: Cloud Run service account
   `834613361298-compute@developer.gserviceaccount.com` has Secret Manager
   Secret Accessor for the deployed secrets.
@@ -1180,7 +1181,7 @@ Acceptance checks:
 
 - DONE: The confusing paste-fallback marker was removed from the main demo UI.
 - API-PROVEN: Hosted sample-PDF branch succeeds on Cloud Run revision
-  `claimcompass-demo-00006-n7p` and records `live_mcp: true`. The remaining
+  `claimcompass-demo-00007-6gr` and records `live_mcp: true`. The remaining
   gate is a manual browser dress rehearsal and backup recording.
 - Hosted sample-PDF flow shows the exact PDF filename, local sample path, and
   GCS URI so judges understand what was processed.
