@@ -58,19 +58,26 @@ export async function getLatestArtifact(denialId: string) {
   return artifact ? (toPlainDocument(artifact) as unknown as DemoArtifact) : null;
 }
 
-export async function getTraceEvents(denialId: string) {
+export async function getTraceEvents(denialId: string, runId?: string) {
   const db = await getMongoDb();
+  const filter = runId ? { denial_id: denialId, run_id: runId } : { denial_id: denialId };
   const events = await db
     .collection("trace_events")
-    .find({ denial_id: denialId })
+    .find(filter)
     .sort({ created_at: -1 })
     .limit(24)
     .toArray();
   return toPlainDocument(events).reverse() as unknown as DemoTraceEvent[];
 }
 
-export async function getLatestDemoRun(denialId: string) {
+export async function getDemoRun(denialId: string, runId?: string) {
   const db = await getMongoDb();
+  if (runId) {
+    const run = await db
+      .collection("demo_runs")
+      .findOne({ denial_id: denialId, run_id: runId });
+    return run ? (toPlainDocument(run) as unknown as DemoRunSnapshot) : null;
+  }
   const run = await db
     .collection("demo_runs")
     .find({ denial_id: denialId })
@@ -78,6 +85,10 @@ export async function getLatestDemoRun(denialId: string) {
     .limit(1)
     .next();
   return run ? (toPlainDocument(run) as unknown as DemoRunSnapshot) : null;
+}
+
+export async function getLatestDemoRun(denialId: string) {
+  return getDemoRun(denialId);
 }
 
 export async function getBillingRuleCount(denialId: string) {

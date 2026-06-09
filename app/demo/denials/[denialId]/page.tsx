@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import {
   getBillingRuleCount,
   getDemoDenial,
+  getDemoRun,
   getLatestArtifact,
-  getLatestDemoRun,
   getTraceEvents,
   summarizeDenialForDiff,
 } from "@/lib/demo-records";
@@ -31,6 +31,16 @@ function formatStep(step?: string) {
 function toolLabel(event: Record<string, unknown>) {
   const step = String(event.step || "");
   const tool = String(event.tool || "");
+  if (tool.includes("replay")) return tool.replace(/_/g, " ");
+  if (step.includes("policy_vector_retrieval_live")) {
+    return "Live Gemini embedding + MongoDB MCP aggregate/find";
+  }
+  if (step.includes("classification_deterministic")) {
+    return "Deterministic golden-path classifier";
+  }
+  if (step.includes("drafter_artifact_reuse")) {
+    return "Validated Gemini artifact reuse";
+  }
   if (step.includes("document_ai")) return "Google Document AI";
   if (step.includes("policy") || tool.includes("policy")) {
     return "Gemini + MongoDB MCP aggregate/find";
@@ -74,15 +84,18 @@ function renderMarkdown(markdown?: string) {
 
 export default async function DenialResultPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ denialId: string }>;
+  searchParams: Promise<{ run?: string }>;
 }) {
   const { denialId } = await params;
+  const { run: runId } = await searchParams;
   const [denial, artifact, traceEvents, demoRun, ruleCount] = await Promise.all([
     getDemoDenial(denialId),
     getLatestArtifact(denialId),
-    getTraceEvents(denialId),
-    getLatestDemoRun(denialId),
+    getTraceEvents(denialId, runId),
+    getDemoRun(denialId, runId),
     getBillingRuleCount(denialId),
   ]);
 
@@ -153,10 +166,10 @@ export default async function DenialResultPage({
 
             <div className="mt-6 space-y-3">
               <TraceRow
-                title="Document AI extraction"
-                tool="Google Document AI Form Parser"
+                title="Source extraction context"
+                tool="Synthetic Document AI extraction available"
                 status="done"
-                note="Extraction fields are present for the synthetic EOB."
+                note="Hosted run labels replayed extraction separately; local release checks prove live Document AI."
               />
               {traceEvents.map((event, index) => (
                 <TraceRow

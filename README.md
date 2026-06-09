@@ -43,6 +43,15 @@ agent loop:
 | Secrets | Google Secret Manager for deployed config, ignored `.env.local` locally |
 | Hosting target | Cloud Run for the demo app |
 
+Hosted demo integrity:
+
+- Every hosted run performs live `gemini-embedding-001` query embedding.
+- Every hosted run performs live MongoDB MCP `aggregate` with `$vectorSearch`,
+  MCP `find`, MCP `update-many`, and MCP `insert-many`.
+- The hosted path labels Document AI extraction and DrafterAgent generation as
+  verified replay/reuse for recording stability; the full live Document AI and
+  Gemini drafting path is covered by local release checks.
+
 The final submission wording should stay honest to the proven deployment path:
 
 > Built with Gemini and Google Cloud Agent Builder using ADK, designed for Agent

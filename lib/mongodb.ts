@@ -4,7 +4,7 @@ declare global {
   var __claimCompassMongoClient: Promise<MongoClient> | undefined;
 }
 
-function getMongoUri() {
+export function getMongoUri() {
   const uri = process.env.MONGODB_URI || process.env.MDB_MCP_CONNECTION_STRING;
   if (!uri) {
     throw new Error("Missing MONGODB_URI for server-side demo data access.");

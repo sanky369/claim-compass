@@ -60,7 +60,7 @@ Goal: build ClaimCompass as a Gemini-powered, Google Cloud Agent Builder / ADK a
 | 15 | Landing page to demo route | DONE | Current landing page routes into a one-button demo gate and then the upload flow. |
 | 16 | Next.js agent demonstration UI | DONE | Upload/paste start, trace panel, result view, citations, before/after diff, and save-as-rule work locally. |
 | 17 | Deployment integration and runtime honesty | DONE | Cloud Run is deployed, hosted health/sample-PDF flow works, service account can read secrets, and Atlas connectivity is temporarily open for final recording. |
-| 18 | Hosted dress rehearsal and UI polish | READY | Full manual hosted dress rehearsal and backup recording are the next gate; hosted sample-PDF run has already passed by API check. |
+| 18 | Hosted dress rehearsal and UI polish | READY | Full manual hosted dress rehearsal and backup recording are the next gate; hosted branch now proves live Gemini embedding plus MongoDB MCP retrieval/write-back. |
 | 19 | README and submission assets | TODO | Judge-readable README, architecture image, screenshots, Devpost copy, repo/license, and honest runtime wording are complete. |
 | 20 | Recording and Devpost submission | TODO | Hosted URL, repo URL, MongoDB track selected, 3-minute video, written description, and synthetic-data safety message submitted. |
 
@@ -1093,14 +1093,23 @@ Acceptance checks:
   `claimcompass-demo`.
 - DONE: Hosted URL:
   `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`.
-- DONE: Revision `claimcompass-demo-00004-hwv` receives 100% traffic with
+- DONE: Revision `claimcompass-demo-00006-n7p` receives 100% traffic with
   `min-instances=0`, max scale `2`, CPU `1`, and memory `1Gi`.
 - DONE: Hosted `/api/health` returns `ok` on Cloud Run.
 - DONE: Hosted `/api/demo/sample-pdf` returns the synthetic PDF with
   `content-type: application/pdf`.
 - DONE: Hosted `/api/demo/run` with `mode: "sample_pdf"` completes from the
-  Cloud Run URL; verification run `run_1781030894860_7d4c600d` completed in
-  `59ms` and redirected to `/demo/denials/demo_denial_001`.
+  Cloud Run URL.
+- DONE: The hosted branch now performs live `gemini-embedding-001` query
+  embedding and live MongoDB MCP `aggregate` with `$vectorSearch`, `find`,
+  `update-many`, and `insert-many`.
+- DONE: Hosted verification run `run_1781036034323_405e5753` returned
+  `live_mcp: true`, retrieved
+  `pb_bcbs_tx_demo_psychotherapy_90_codes_modifier_missing_01`, and completed
+  in `14747ms`.
+- DONE: Hosted save-as-rule route now writes through MongoDB MCP `insert-many`
+  and returns `live_mcp: true`; hosted verification rule
+  `rule_1781036075633_fe26ed26` succeeded.
 - DONE: Cloud Run service account
   `834613361298-compute@developer.gserviceaccount.com` has Secret Manager
   Secret Accessor for the deployed secrets.
@@ -1125,10 +1134,10 @@ CONFIRM_CLOUD_RUN_DEPLOY=yes scripts/deploy/cloud-run-frontend.sh
 
 Notes:
 
-- The hosted Cloud Run route uses a fast, deterministic demo path so the final
-  recording does not fail because of long child-process request execution. The
-  local release checks still prove the full Gemini, Document AI, MongoDB MCP,
-  vector retrieval, and DrafterAgent path.
+- The hosted Cloud Run route now runs live Gemini embedding and MongoDB MCP
+  retrieval/write-back. It still labels Document AI extraction and DrafterAgent
+  generation as replay/reuse for recording stability; local release checks
+  prove those full live paths.
 - Keep `min-instances=0` unless cold start becomes a recording problem. Set
   `min-instances=1` only briefly if needed, then scale back.
 
@@ -1170,8 +1179,9 @@ Measurements:
 Acceptance checks:
 
 - DONE: The confusing paste-fallback marker was removed from the main demo UI.
-- API-PROVEN: Hosted sample-PDF run succeeds on Cloud Run. The remaining gate is
-  a manual browser dress rehearsal and backup recording.
+- API-PROVEN: Hosted sample-PDF branch succeeds on Cloud Run revision
+  `claimcompass-demo-00006-n7p` and records `live_mcp: true`. The remaining
+  gate is a manual browser dress rehearsal and backup recording.
 - Hosted sample-PDF flow shows the exact PDF filename, local sample path, and
   GCS URI so judges understand what was processed.
 - Backup recording exists before final recording day.

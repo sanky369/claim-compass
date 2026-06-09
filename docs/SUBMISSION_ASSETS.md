@@ -1,6 +1,6 @@
 # ClaimCompass Submission Assets
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## Short Pitch
 
@@ -23,12 +23,14 @@ the hackathon, the demo focuses on one synthetic golden path: BCBS Texas Demo,
 CPT `90837`, missing telehealth modifier `95`, denial codes `CO-45` and `N179`.
 The user opens the synthetic PDF, starts the run, and watches ClaimCompass:
 
-- upload the sample PDF to Cloud Storage;
-- extract denial fields with Google Document AI;
-- retrieve synthetic payer playbook guidance from MongoDB Atlas Vector Search;
-- use MongoDB MCP for agent reads, vector retrieval, trace inserts, artifact
-  inserts, and save-as-rule write-back;
-- use Gemini to classify the denial and draft corrected-claim guidance;
+- use the verified synthetic Document AI extraction for the sample PDF;
+- run a live `gemini-embedding-001` query embedding;
+- retrieve synthetic payer playbook guidance through live MongoDB MCP
+  `aggregate` with `$vectorSearch`;
+- use MongoDB MCP `find`, `update-many`, and `insert-many` for hosted
+  read/write proof;
+- reuse the latest validated Gemini-drafted corrected-claim artifact for
+  recording stability;
 - show citations, trace events, and a before/after MongoDB diff in the demo UI.
 
 This is intentionally not a generic chatbot. The visible proof is the loop:
@@ -62,8 +64,11 @@ If a final Agent Runtime deployment succeeds, this may be changed to:
 - Vector index: `playbook_vec`
 - Retrieval proof: MongoDB MCP `aggregate` with `$vectorSearch` as the first
   pipeline stage
-- Write-back proof: inserted trace events, generated artifact, demo run record,
-  and save-as-rule document
+- Hosted write-back proof: MCP `update-many` on `denials`, MCP `insert-many`
+  into `trace_events`, MCP `insert-many` into `demo_runs`, and MCP
+  `insert-many` into `billing_rules` for save-as-rule
+- Local full-path proof: Document AI extraction and Gemini drafting scripts use
+  MongoDB MCP write-back and pass the release checks
 - Safety proof: synthetic data only, no PHI, no real payer documents
 
 ## Screenshot List
@@ -85,17 +90,17 @@ Capture these after the hosted dress rehearsal:
 > Here is the denied claim: CPT 90837, BCBS Texas Demo, denied with CO-45 and
 > N179 because the telehealth modifier is missing.
 >
-> When I start the run, ClaimCompass uploads the sample PDF to Cloud Storage,
-> processes it with Google Document AI, retrieves payer guidance from MongoDB
-> Atlas Vector Search through the official MongoDB MCP Server, and uses Gemini
-> to classify the next-best action.
+> When I start the hosted run, ClaimCompass uses the verified synthetic
+> Document AI extraction, creates a live Gemini embedding query, retrieves payer
+> guidance from MongoDB Atlas Vector Search through the official MongoDB MCP
+> Server, and writes the updated denial state back through MCP.
 >
 > The important part is the trace. This is not a chatbot answer; the app shows
 > the tool path, the retrieved playbook citation, the decision bucket, and the
 > before/after MongoDB state.
 >
-> ClaimCompass recommends a corrected claim, not a formal appeal, and generates
-> human-review guidance tied to the retrieved playbook.
+> ClaimCompass recommends a corrected claim, not a formal appeal, and displays
+> validated Gemini-drafted human-review guidance tied to the retrieved playbook.
 >
 > Finally, the save-as-rule action writes a reusable billing rule back to
 > MongoDB so the same denial pattern is easier to prevent next time.

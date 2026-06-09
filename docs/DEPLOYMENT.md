@@ -11,24 +11,30 @@ Registry, Gemini, Document AI, and network egress can create billable usage.
 - URL: `https://claimcompass-demo-ss3fmrraoa-uc.a.run.app`
 - Service: `claimcompass-demo`
 - Region: `us-central1`
-- Current serving revision: `claimcompass-demo-00004-hwv`
+- Current serving revision: `claimcompass-demo-00006-n7p`
 - Traffic: `100%` to latest revision
 - Min instances: `0`
 - Max instances: `2`
 - Runtime service account:
   `834613361298-compute@developer.gserviceaccount.com`
 
-Verified on 2026-06-09:
+Verified on 2026-06-09 after the live-MCP hosted refactor:
 
 - `/api/health` returns `ok`.
 - `/api/demo/sample-pdf` returns
   `golden-bcbs-tx-90837-missing-modifier-eob.pdf` as `application/pdf`.
 - `/api/demo/run` with `mode: "sample_pdf"` completed from Cloud Run with run
-  id `run_1781030894860_7d4c600d`.
-- Result page `/demo/denials/demo_denial_001?run=run_1781030894860_7d4c600d`
-  renders the trace, source PDF/GCS URI, corrected-claim guidance, citations,
-  MongoDB write-back proof, and save-as-rule action.
-- Save-as-rule endpoint has been verified on the hosted app.
+  id `run_1781036034323_405e5753`.
+- Hosted run returned `live_mcp: true` and completed in `14747ms`.
+- The hosted branch performs live `gemini-embedding-001` embedding and live
+  MongoDB MCP `aggregate` with `$vectorSearch`, `find`, `update-many`, and
+  `insert-many`.
+- Result page `/demo/denials/demo_denial_001?run=run_1781036034323_405e5753`
+  renders only the fresh run-scoped trace labels, source PDF/GCS URI,
+  corrected-claim guidance, citations, MongoDB write-back proof, and
+  save-as-rule action.
+- Save-as-rule endpoint returned `live_mcp: true` with rule id
+  `rule_1781036075633_fe26ed26`.
 
 ## Current Target
 
@@ -40,9 +46,10 @@ Verified on 2026-06-09:
 - Frontend/API: Next.js app with server-side route handlers
 - Agent execution path: local release checks run the full RootAgent and
   DrafterAgent smoke scripts with Gemini, Document AI, MongoDB MCP, and Atlas
-  Vector Search. The hosted Cloud Run demo uses a fast deterministic route for
-  recording stability while preserving the same synthetic denial, artifact,
-  trace, citations, and MongoDB write-back proof.
+  Vector Search. The hosted Cloud Run demo runs live Gemini embedding plus
+  MongoDB MCP vector retrieval and write-back, while labeling Document AI
+  extraction and DrafterAgent generation as replay/reuse for recording
+  stability.
 
 ## Required Secrets
 
