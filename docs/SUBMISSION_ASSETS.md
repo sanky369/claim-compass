@@ -11,6 +11,12 @@ rules from MongoDB Atlas Vector Search through the official MongoDB MCP Server,
 classifies the next-best action, drafts corrected-claim guidance with citations,
 and writes the result back to MongoDB.
 
+The product surface was designed with MagicPath-assisted website exploration and
+then built through an iterative Codex development workflow with a human in the
+loop: architecture decisions, cost/security guardrails, repo changes, evals,
+Cloud Run deployment, and final demo checks were reviewed and steered by the
+builder throughout the hackathon.
+
 ## Devpost Description Draft
 
 Independent therapists lose hours and revenue when an insurance denial says
@@ -37,9 +43,27 @@ This is intentionally not a generic chatbot. The visible proof is the loop:
 document in, tool trace, grounded retrieval, next-best-action classification,
 artifact generation, and MongoDB write-back.
 
+The website and demo flow were shaped with MagicPath for rapid design direction,
+then implemented with Codex in a human-in-the-loop development process. Codex
+helped turn the hackathon blueprint into tracked systems, code, tests, docs,
+deployment scripts, and verification runs; the builder made the product, safety,
+scope, and submission decisions.
+
 All demo documents are synthetic and marked `DEMO DATA - NOT REAL PHI`.
 ClaimCompass is decision support for human billing review, not legal, clinical,
 billing, or payer-policy advice.
+
+## Design and Build Process
+
+- Website/design direction: MagicPath was used to accelerate exploration of the
+  landing page and demo presentation, keeping the product focused on a clear
+  denial-to-action story for therapists.
+- Development partner: Codex was used as the coding agent across the repo to
+  implement the Next.js UI, ADK scaffold, MongoDB MCP integration, Gemini
+  embedding/generation paths, evals, docs, and Cloud Run deployment workflow.
+- Human in the loop: the builder reviewed architecture choices, approved
+  cost-sensitive cloud actions, kept the healthcare safety constraints tight,
+  verified outputs, and decided what belonged in the final hackathon scope.
 
 ## Stack Wording
 
