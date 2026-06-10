@@ -12,6 +12,9 @@ telehealth modifier `95`, denial codes `CO-45` and `N179`, classified as a
 
 > Demo data only. This project must not be used with real PHI, payer portal
 > screenshots, real EOBs, subscriber IDs, or patient documents.
+> <img width="2832" height="1540" alt="CleanShot 2026-06-10 at 19 29 11@2x" src="https://github.com/user-attachments/assets/69f57803-0987-4dde-9ced-5c7c8b8eea99" />
+
+Cinematic Video (problem and solution understanding) - https://notebooklm.google.com/notebook/7815c96f-d773-4405-b4d4-5f326f81202f/artifact/495b6200-c26d-463c-8cdb-0477d29a2e57?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_2&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_2_
 
 ## What It Builds
 
